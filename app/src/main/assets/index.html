@@ -1,32 +1,30 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <meta name="theme-color" content="#0B0F14" />
-  <title>AutoDuck Studio — Documentary Voiceover Mixer</title>
+  <meta name="theme-color" content="#090B0E" />
+  <title>AutoDuck Studio — CapCut Style Auto Ducking</title>
   <style>
     :root {
-      --bg-base: #0B0F14;
-      --bg-surface: #121821;
-      --bg-elevated: #1A222E;
-      --bg-input: #0F141C;
-      --border-subtle: rgba(148, 163, 184, 0.14);
-      --border-active: rgba(34, 211, 238, 0.45);
-      --text-primary: #F1F5F9;
-      --text-secondary: #94A3B8;
-      --text-muted: #64748B;
-      --cyan: #22D3EE;
-      --cyan-soft: rgba(34, 211, 238, 0.14);
+      --bg-base: #090B0E;
+      --bg-panel: #12161D;
+      --bg-card: #181E27;
+      --bg-input: #0E1218;
+      --border: rgba(148, 163, 184, 0.14);
+      --text: #F8FAFC;
+      --text-sub: #94A3B8;
+      --text-dim: #64748B;
+      --cyan: #00E5FF;
+      --cyan-soft: rgba(0, 229, 255, 0.14);
       --amber: #F59E0B;
       --amber-soft: rgba(245, 158, 11, 0.14);
       --emerald: #10B981;
-      --emerald-soft: rgba(16, 185, 129, 0.16);
-      --rose: #F43F5E;
-      --radius-lg: 18px;
+      --emerald-soft: rgba(16, 185, 129, 0.15);
+      --rose: #FB7185;
+      --radius-lg: 16px;
       --radius-md: 12px;
       --radius-sm: 8px;
-      --shadow-card: 0 8px 28px rgba(0, 0, 0, 0.35);
     }
 
     * {
@@ -37,185 +35,412 @@
     html, body {
       margin: 0;
       padding: 0;
-      background-color: var(--bg-base);
-      color: var(--text-primary);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Helvetica, Arial, sans-serif;
-      font-size: 15px;
+      background: var(--bg-base);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans Bengali", Arial, sans-serif;
+      font-size: 14px;
       line-height: 1.45;
       overflow-x: hidden;
     }
 
     body {
-      padding: calc(14px + env(safe-area-inset-top)) 14px calc(28px + env(safe-area-inset-bottom)) 14px;
-      background-image:
-        radial-gradient(circle at 12% 0%, rgba(34, 211, 238, 0.08), transparent 42%),
-        radial-gradient(circle at 88% 10%, rgba(245, 158, 11, 0.06), transparent 40%);
+      padding: calc(8px + env(safe-area-inset-top)) 10px calc(86px + env(safe-area-inset-bottom)) 10px;
       min-height: 100vh;
     }
 
-    .app-shell {
+    .studio-shell {
       max-width: 820px;
       margin: 0 auto;
       display: flex;
       flex-direction: column;
-      gap: 14px;
-    }
-
-    /* Header */
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 4px 2px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
       gap: 10px;
     }
 
-    .brand-mark {
-      width: 38px;
-      height: 38px;
-      border-radius: 11px;
-      background: linear-gradient(135deg, rgba(34, 211, 238, 0.22), rgba(16, 185, 129, 0.18));
-      border: 1px solid rgba(34, 211, 238, 0.35);
+    /* CapCut Top Header */
+    .cap-header {
       display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 4px 2px;
+    }
+
+    .cap-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .cap-logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: linear-gradient(135deg, rgba(0, 229, 255, 0.25), rgba(16, 185, 129, 0.2));
+      border: 1px solid rgba(0, 229, 255, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cap-logo svg {
+      width: 18px;
+      height: 18px;
+      stroke: var(--cyan);
+    }
+
+    .cap-title {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin: 0;
+    }
+
+    .cap-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-guide {
+      appearance: none;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 7px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      min-height: 36px;
+      cursor: pointer;
+    }
+
+    .btn-guide.active {
+      border-color: var(--cyan);
+      color: var(--cyan);
+      background: var(--cyan-soft);
+    }
+
+    .btn-top-export {
+      appearance: none;
+      border: none;
+      background: linear-gradient(135deg, #00D2FF, #00E5FF);
+      color: #031B24;
+      border-radius: 999px;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 800;
+      min-height: 36px;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(0, 229, 255, 0.28);
+    }
+
+    /* Beginner Quick Guide Card */
+    .guide-drawer {
+      display: none;
+      background: linear-gradient(135deg, rgba(0, 229, 255, 0.08), rgba(18, 22, 29, 0.98));
+      border: 1px solid rgba(0, 229, 255, 0.35);
+      border-radius: var(--radius-lg);
+      padding: 12px 14px;
+      gap: 8px;
+      flex-direction: column;
+    }
+
+    .guide-drawer.open {
+      display: flex;
+    }
+
+    .guide-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text-sub);
+    }
+
+    .guide-num {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--cyan-soft);
+      color: var(--cyan);
+      font-weight: 800;
+      font-size: 12px;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
     }
 
-    .brand-mark svg {
-      width: 22px;
-      height: 22px;
-      stroke: var(--cyan);
-    }
-
-    .brand-title {
-      font-size: 18px;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      margin: 0;
-    }
-
-    .brand-sub {
-      font-size: 12px;
-      color: var(--text-secondary);
-      margin: 0;
-    }
-
-    .badge-local {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.03em;
-      text-transform: uppercase;
-      padding: 5px 10px;
-      border-radius: 999px;
-      background: var(--bg-elevated);
-      border: 1px solid var(--border-subtle);
-      color: var(--cyan);
-      white-space: nowrap;
-    }
-
-    /* Card */
-    .card {
-      background: var(--bg-surface);
-      border: 1px solid var(--border-subtle);
+    /* CapCut Preview Stage */
+    .preview-stage {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      max-height: 230px;
+      background: #040608;
       border-radius: var(--radius-lg);
-      padding: 16px;
-      box-shadow: var(--shadow-card);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
     }
 
-    .section-header {
+    #previewVideo {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: none;
+      background: #000;
+    }
+
+    .stage-monitor {
+      width: 100%;
+      height: 100%;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      text-align: center;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(0, 229, 255, 0.1), transparent 45%),
+        radial-gradient(circle at 80% 80%, rgba(245, 158, 11, 0.08), transparent 45%);
+    }
+
+    .stage-pill {
+      font-size: 12px;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border);
+      color: var(--text-sub);
+    }
+
+    .stage-pill.ducking {
+      background: var(--cyan-soft);
+      border-color: rgba(0, 229, 255, 0.4);
+      color: var(--cyan);
+    }
+
+    .stage-pill.normal {
+      background: var(--amber-soft);
+      border-color: rgba(245, 158, 11, 0.4);
+      color: var(--amber);
+    }
+
+    .vu-meters {
+      width: min(320px, 88%);
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .vu-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-sub);
+    }
+
+    .vu-label {
+      width: 52px;
+      text-align: left;
+    }
+
+    .vu-track {
+      flex: 1;
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+    }
+
+    .vu-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      transition: width 0.07s linear;
+    }
+
+    .vu-fill.voice { background: linear-gradient(90deg, #06B6D4, #00E5FF); }
+    .vu-fill.music { background: linear-gradient(90deg, #D97706, #FBBF24); }
+
+    /* CapCut Transport Bar */
+    .transport-strip {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 8px;
-      margin-bottom: 12px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 6px 10px;
     }
 
-    .section-title {
-      font-size: 13px;
+    .timecode {
+      font-variant-numeric: tabular-nums;
+      font-size: 12px;
       font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--text-secondary);
-      margin: 0;
+      color: var(--text-sub);
+      min-width: 86px;
+    }
+
+    .transport-center {
       display: flex;
       align-items: center;
-      gap: 7px;
+      gap: 8px;
     }
 
-    .dot {
-      width: 8px;
-      height: 8px;
+    .btn-circle {
+      appearance: none;
+      border: none;
+      width: 44px;
+      height: 44px;
       border-radius: 50%;
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
     }
-    .dot-cyan { background: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
-    .dot-amber { background: var(--amber); box-shadow: 0 0 8px var(--amber); }
-    .dot-emerald { background: var(--emerald); box-shadow: 0 0 8px var(--emerald); }
 
-    /* Track Upload Grid */
-    .tracks-grid {
-      display: grid;
-      grid-template-columns: 1fr;
+    .btn-circle:disabled { opacity: 0.38; cursor: not-allowed; }
+
+    .btn-play-main {
+      background: var(--cyan);
+      color: #041D26;
+      box-shadow: 0 3px 14px rgba(0, 229, 255, 0.32);
+    }
+
+    .btn-stop-mini {
+      background: var(--bg-card);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-reset-mini {
+      appearance: none;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-sub);
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      min-height: 36px;
+      cursor: pointer;
+    }
+
+    /* CapCut Multi-Track Timeline */
+    .timeline-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .timeline-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-sub);
+    }
+
+    .timeline-wrap {
+      position: relative;
+      width: 100%;
+      height: 158px;
+      background: #07090C;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      touch-action: none;
+    }
+
+    #timelineCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: pointer;
+    }
+
+    .timeline-empty {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      color: var(--text-dim);
+      font-size: 12px;
+      text-align: center;
+      padding: 12px;
+      pointer-events: none;
+    }
+
+    /* Tool Inspector Panel (Switches per Bottom Tab) */
+    .tool-panel {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 14px;
+      display: none;
+      flex-direction: column;
       gap: 12px;
     }
 
-    @media (min-width: 680px) {
-      .tracks-grid {
-        grid-template-columns: 1fr 1fr;
-      }
-    }
-
-    .track-box {
-      position: relative;
-      background: var(--bg-input);
-      border: 1.5px dashed rgba(148, 163, 184, 0.28);
-      border-radius: var(--radius-md);
-      padding: 14px;
-      transition: border-color 0.2s ease, background-color 0.2s ease;
+    .tool-panel.active {
       display: flex;
-      flex-direction: column;
-      gap: 10px;
     }
 
-    .track-box.loaded-voice {
-      border-style: solid;
-      border-color: rgba(34, 211, 238, 0.45);
-      background: linear-gradient(180deg, rgba(34, 211, 238, 0.07), rgba(15, 20, 28, 0.95));
-    }
-
-    .track-box.loaded-music {
-      border-style: solid;
-      border-color: rgba(245, 158, 11, 0.45);
-      background: linear-gradient(180deg, rgba(245, 158, 11, 0.07), rgba(15, 20, 28, 0.95));
-    }
-
-    .track-top {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 10px;
-    }
-
-    .track-label {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--text-primary);
+    .panel-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text);
+      margin: 0;
       display: flex;
       align-items: center;
-      gap: 7px;
+      justify-content: space-between;
+      gap: 8px;
     }
 
-    .track-hint {
+    .panel-intro {
       font-size: 12px;
-      color: var(--text-muted);
-      margin-top: 2px;
+      color: var(--text-sub);
+      margin: 0;
+    }
+
+    /* Track Upload Cards */
+    .track-card {
+      background: var(--bg-card);
+      border: 1.5px dashed rgba(148, 163, 184, 0.28);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .track-card.loaded-voice {
+      border-style: solid;
+      border-color: rgba(0, 229, 255, 0.5);
+    }
+
+    .track-card.loaded-music {
+      border-style: solid;
+      border-color: rgba(245, 158, 11, 0.5);
     }
 
     .track-meta {
@@ -223,51 +448,36 @@
       align-items: center;
       justify-content: space-between;
       gap: 8px;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--border-subtle);
+      background: var(--bg-input);
+      border: 1px solid var(--border);
       border-radius: var(--radius-sm);
       padding: 8px 10px;
-      min-height: 40px;
     }
 
-    .track-filename {
+    .track-name {
       font-size: 13px;
-      font-weight: 500;
-      color: var(--text-primary);
+      font-weight: 600;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
       flex: 1;
     }
 
-    .track-filename.placeholder {
-      color: var(--text-muted);
-      font-weight: 400;
-    }
+    .track-name.empty { color: var(--text-dim); font-weight: 400; }
 
-    .track-duration {
+    .badge-dur {
       font-variant-numeric: tabular-nums;
       font-size: 12px;
       font-weight: 700;
-      padding: 3px 8px;
+      padding: 2px 8px;
       border-radius: 6px;
-      background: var(--bg-elevated);
-      color: var(--text-secondary);
-      flex-shrink: 0;
+      background: #232B38;
+      color: var(--text-sub);
     }
 
-    .track-actions {
+    .btn-row {
       display: flex;
       gap: 8px;
-    }
-
-    .file-input-hidden {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      opacity: 0;
-      overflow: hidden;
-      pointer-events: none;
     }
 
     .btn {
@@ -275,294 +485,97 @@
       border: none;
       border-radius: var(--radius-md);
       font-family: inherit;
-      font-weight: 600;
-      font-size: 14px;
+      font-weight: 700;
+      font-size: 13px;
       min-height: 46px;
-      padding: 10px 16px;
+      padding: 10px 14px;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      transition: transform 0.1s ease, opacity 0.2s ease, background-color 0.2s ease;
-      user-select: none;
+      gap: 6px;
     }
 
-    .btn:active:not(:disabled) {
-      transform: scale(0.98);
-    }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-voice { flex: 1; background: var(--cyan-soft); color: var(--cyan); border: 1px solid rgba(0, 229, 255, 0.35); }
+    .btn-music { flex: 1; background: var(--amber-soft); color: var(--amber); border: 1px solid rgba(245, 158, 11, 0.35); }
+    .btn-clear { min-width: 46px; background: rgba(251, 113, 133, 0.14); color: var(--rose); border: 1px solid rgba(251, 113, 133, 0.3); }
 
-    .btn:disabled {
-      opacity: 0.42;
-      cursor: not-allowed;
-    }
-
-    .btn-pick {
-      flex: 1;
-      background: var(--bg-elevated);
-      color: var(--text-primary);
-      border: 1px solid var(--border-subtle);
-    }
-
-    .btn-pick-voice {
-      border-color: rgba(34, 211, 238, 0.32);
-    }
-
-    .btn-pick-music {
-      border-color: rgba(245, 158, 11, 0.32);
-    }
-
-    .btn-clear {
-      min-width: 46px;
-      padding: 0 12px;
-      background: rgba(244, 63, 94, 0.12);
-      color: #FDA4AF;
-      border: 1px solid rgba(244, 63, 94, 0.25);
-    }
-
-    /* Length & Loop Options */
-    .sync-row {
-      margin-top: 14px;
-      padding-top: 14px;
-      border-top: 1px solid var(--border-subtle);
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .toggle-label {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      min-height: 44px;
-      cursor: pointer;
-      padding: 6px 10px;
-      border-radius: var(--radius-md);
-      background: var(--bg-input);
-      border: 1px solid var(--border-subtle);
-    }
-
-    .toggle-text {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .toggle-title {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text-primary);
-    }
-
-    .toggle-desc {
-      font-size: 12px;
-      color: var(--text-secondary);
-    }
-
-    .switch {
-      position: relative;
-      width: 50px;
-      height: 28px;
-      flex-shrink: 0;
-    }
-
-    .switch input {
+    .file-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
       opacity: 0;
-      width: 0;
-      height: 0;
-    }
-
-    .switch-slider {
-      position: absolute;
-      inset: 0;
-      background: #2A3544;
-      border-radius: 999px;
-      transition: background-color 0.2s ease;
-    }
-
-    .switch-slider::before {
-      content: "";
-      position: absolute;
-      width: 22px;
-      height: 22px;
-      left: 3px;
-      top: 3px;
-      background: #FFFFFF;
-      border-radius: 50%;
-      transition: transform 0.2s ease;
-    }
-
-    .switch input:checked + .switch-slider {
-      background: var(--cyan);
-    }
-
-    .switch input:checked + .switch-slider::before {
-      transform: translateX(22px);
-      background: #082F49;
-    }
-
-    /* Waveform Canvas */
-    .canvas-wrap {
-      position: relative;
-      width: 100%;
-      height: 176px;
-      background: #080C11;
-      border-radius: var(--radius-md);
-      border: 1px solid var(--border-subtle);
-      overflow: hidden;
-      touch-action: none;
-    }
-
-    #waveformCanvas {
-      width: 100%;
-      height: 100%;
-      display: block;
-      cursor: pointer;
-    }
-
-    .canvas-empty {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
       pointer-events: none;
-      color: var(--text-muted);
-      font-size: 13px;
-      text-align: center;
-      padding: 16px;
     }
 
-    .legend-row {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin-top: 10px;
-      font-size: 12px;
-      color: var(--text-secondary);
-    }
-
-    .legend-items {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 14px;
-    }
-
-    .legend-item {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .swatch {
-      width: 12px;
-      height: 4px;
-      border-radius: 2px;
-      display: inline-block;
-    }
-
-    /* Transport Controls */
-    .transport-bar {
-      margin-top: 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .seek-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .time-readout {
-      font-variant-numeric: tabular-nums;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-secondary);
-      min-width: 96px;
-      text-align: right;
-    }
-
-    .transport-buttons {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    .btn-play {
-      background: linear-gradient(135deg, #06B6D4, #22D3EE);
-      color: #04202C;
-      font-weight: 700;
-      min-height: 50px;
-    }
-
-    .btn-stop {
-      background: var(--bg-elevated);
-      color: var(--text-primary);
-      border: 1px solid var(--border-subtle);
-      min-height: 50px;
-    }
-
-    /* Sliders */
-    .controls-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 14px;
-    }
-
-    @media (min-width: 680px) {
-      .controls-grid {
-        grid-template-columns: 1fr 1fr;
-      }
-    }
-
-    .control-item {
-      background: var(--bg-input);
-      border: 1px solid var(--border-subtle);
+    /* Beginner-Friendly Parameter Card */
+    .param-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
       border-radius: var(--radius-md);
-      padding: 12px 14px;
+      padding: 12px;
       display: flex;
       flex-direction: column;
       gap: 8px;
     }
 
-    .control-head {
+    .param-top {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 8px;
     }
 
-    .control-name {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-primary);
+    .param-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
     }
 
-    .control-sub {
-      font-size: 11px;
-      color: var(--text-muted);
-    }
-
-    .control-value {
+    .param-val {
       font-variant-numeric: tabular-nums;
       font-size: 13px;
-      font-weight: 700;
-      color: var(--cyan);
-      background: var(--cyan-soft);
-      padding: 3px 9px;
+      font-weight: 800;
+      padding: 3px 10px;
       border-radius: 999px;
+      background: var(--cyan-soft);
+      color: var(--cyan);
       white-space: nowrap;
     }
 
-    .control-value.amber {
-      color: var(--amber);
+    .param-val.amber {
       background: var(--amber-soft);
+      color: var(--amber);
+    }
+
+    .param-help {
+      font-size: 12px;
+      color: var(--text-sub);
+      margin: 0;
+    }
+
+    .best-box {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      border-radius: var(--radius-sm);
+      padding: 6px 9px;
+      font-size: 11.5px;
+      color: #6EE7B7;
+    }
+
+    .live-tip {
+      font-weight: 700;
+      color: var(--cyan);
+    }
+
+    .live-tip.warn {
+      color: var(--amber);
     }
 
     input[type="range"] {
@@ -578,7 +591,7 @@
     input[type="range"]::-webkit-slider-runnable-track {
       height: 6px;
       border-radius: 999px;
-      background: #243040;
+      background: #273140;
     }
 
     input[type="range"]::-webkit-slider-thumb {
@@ -588,353 +601,555 @@
       height: 22px;
       border-radius: 50%;
       background: var(--cyan);
-      border: 2px solid #0B0F14;
+      border: 2px solid #090B0E;
       margin-top: -8px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
     }
 
-    input[type="range"].amber-slider::-webkit-slider-thumb {
+    input[type="range"].amber::-webkit-slider-thumb {
       background: var(--amber);
     }
 
-    input[type="range"]::-moz-range-track {
-      height: 6px;
-      border-radius: 999px;
-      background: #243040;
+    /* Switch */
+    .switch-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      cursor: pointer;
     }
 
-    input[type="range"]::-moz-range-thumb {
+    .switch {
+      position: relative;
+      width: 48px;
+      height: 28px;
+      flex-shrink: 0;
+    }
+
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .switch-slider {
+      position: absolute;
+      inset: 0;
+      background: #2C3646;
+      border-radius: 999px;
+      transition: background 0.2s;
+    }
+    .switch-slider::before {
+      content: "";
+      position: absolute;
       width: 22px;
       height: 22px;
+      left: 3px;
+      top: 3px;
       border-radius: 50%;
-      background: var(--cyan);
-      border: 2px solid #0B0F14;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+      background: #fff;
+      transition: transform 0.2s;
     }
+    .switch input:checked + .switch-slider { background: var(--cyan); }
+    .switch input:checked + .switch-slider::before { transform: translateX(20px); background: #041D26; }
 
-    input[type="range"].amber-slider::-moz-range-thumb {
-      background: var(--amber);
-    }
-
-    /* Export Card */
-    .export-card {
-      background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(18, 24, 33, 0.98));
-      border-color: rgba(16, 185, 129, 0.28);
-    }
-
-    .btn-export {
-      width: 100%;
-      min-height: 54px;
-      font-size: 15px;
-      font-weight: 700;
-      background: linear-gradient(135deg, #059669, #10B981);
-      color: #032219;
-      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.25);
-    }
-
-    .status-banner {
-      margin-top: 12px;
-      padding: 10px 12px;
-      border-radius: var(--radius-sm);
-      background: var(--bg-input);
-      border: 1px solid var(--border-subtle);
-      font-size: 13px;
-      color: var(--text-secondary);
-      display: none;
-      flex-direction: column;
+    /* Presets */
+    .presets-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
       gap: 8px;
     }
 
-    .status-banner.visible {
+    .preset-btn {
+      appearance: none;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text);
+      border-radius: var(--radius-md);
+      padding: 10px;
+      text-align: left;
+      cursor: pointer;
       display: flex;
+      flex-direction: column;
+      gap: 2px;
     }
 
-    .progress-track {
+    .preset-btn.active {
+      border-color: var(--cyan);
+      background: var(--cyan-soft);
+    }
+
+    .preset-name { font-size: 13px; font-weight: 800; }
+    .preset-desc { font-size: 11px; color: var(--text-sub); }
+
+    /* Export Options (WAV & MP4) */
+    .format-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .format-card {
+      appearance: none;
+      border: 1.5px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .format-card.active {
+      border-color: var(--cyan);
+      background: var(--cyan-soft);
+    }
+
+    .aspect-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .aspect-chip {
+      flex: 1;
+      min-height: 40px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text-sub);
+      border-radius: var(--radius-sm);
+      font-weight: 700;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .aspect-chip.active {
+      border-color: var(--amber);
+      color: var(--amber);
+      background: var(--amber-soft);
+    }
+
+    .btn-export-go {
       width: 100%;
-      height: 6px;
+      min-height: 52px;
+      font-size: 15px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #059669, #10B981);
+      color: #032219;
+    }
+
+    .export-status {
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px;
+      font-size: 12.5px;
+      color: var(--text-sub);
+    }
+
+    .export-status.visible { display: flex; }
+
+    .prog-bar {
+      width: 100%;
+      height: 7px;
       border-radius: 999px;
-      background: #232F3E;
+      background: #232D3B;
       overflow: hidden;
     }
 
-    .progress-fill {
+    .prog-fill {
       height: 100%;
       width: 0%;
       background: linear-gradient(90deg, var(--cyan), var(--emerald));
       transition: width 0.2s ease;
     }
 
-    .presets-row {
+    /* CapCut Bottom Navigation Toolbar */
+    .cap-bottom-bar {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 40;
+      background: rgba(13, 17, 23, 0.96);
+      backdrop-filter: blur(14px);
+      border-top: 1px solid var(--border);
+      padding: 6px 8px calc(6px + env(safe-area-inset-bottom)) 8px;
       display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
+      justify-content: space-around;
+      gap: 4px;
     }
 
-    .preset-chip {
+    .cap-tab {
+      flex: 1;
+      max-width: 110px;
       appearance: none;
-      border: 1px solid var(--border-subtle);
-      background: var(--bg-elevated);
-      color: var(--text-secondary);
-      border-radius: 999px;
-      padding: 6px 12px;
-      font-size: 12px;
-      font-weight: 600;
-      min-height: 34px;
+      border: none;
+      background: transparent;
+      color: var(--text-sub);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      min-height: 54px;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 700;
       cursor: pointer;
     }
 
-    .preset-chip.active {
-      border-color: var(--cyan);
+    .cap-tab svg {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+    }
+
+    .cap-tab.active {
       color: var(--cyan);
       background: var(--cyan-soft);
     }
   </style>
 </head>
 <body>
-  <main class="app-shell">
-    <!-- Header -->
-    <header class="topbar">
-      <div class="brand">
-        <div class="brand-mark" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <main class="studio-shell">
+    <!-- Top CapCut Header -->
+    <header class="cap-header">
+      <div class="cap-brand">
+        <div class="cap-logo" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
             <path d="M19 10v1a7 7 0 0 1-14 0v-1" />
             <path d="M3 15c3 0 4 4 9 4s6-4 9-4" />
           </svg>
         </div>
-        <div>
-          <h1 class="brand-title">AutoDuck Studio</h1>
-          <p class="brand-sub">Documentary Voiceover &amp; Music Ducking</p>
-        </div>
+        <h1 class="cap-title">AutoDuck Studio</h1>
       </div>
-      <span class="badge-local">100% Local Audio</span>
+      <div class="cap-actions">
+        <button type="button" class="btn-guide" id="guideToggleBtn">? সহজ গাইড</button>
+        <button type="button" class="btn-top-export" id="topExportBtn">Export</button>
+      </div>
     </header>
 
-    <!-- Track Inputs & Sync -->
-    <section class="card" aria-label="Audio Tracks">
-      <div class="section-header">
-        <h2 class="section-title"><span class="dot dot-cyan"></span> Audio Tracks</h2>
-        <span id="outputLengthBadge" class="track-duration">Mix: 00:00</span>
+    <!-- Beginner Quick Guide -->
+    <section class="guide-drawer" id="guideDrawer" aria-label="Beginner Guide">
+      <div class="guide-step">
+        <span class="guide-num">১</span>
+        <span><strong>ট্র্যাক নিন:</strong> "ট্র্যাক" ট্যাব থেকে আপনার <strong>ভয়েসওভার (অডিও বা MP4 ভিডিও)</strong> এবং <strong>ব্যাকগ্রাউন্ড মিউজিক</strong> সিলেক্ট করুন।</span>
       </div>
-
-      <div class="tracks-grid">
-        <!-- Track 1: Voiceover -->
-        <div class="track-box" id="voiceBox">
-          <div class="track-top">
-            <div>
-              <div class="track-label">Track 1: Voiceover Audio</div>
-              <div class="track-hint">Primary speech (.mp3, .wav, .m4a, .ogg)</div>
-            </div>
-          </div>
-          <div class="track-meta">
-            <span class="track-filename placeholder" id="voiceName">No voiceover loaded</span>
-            <span class="track-duration" id="voiceDuration">00:00</span>
-          </div>
-          <div class="track-actions">
-            <input type="file" id="voiceInput" class="file-input-hidden" accept=".mp3,.wav,.m4a,.ogg,audio/*" />
-            <button type="button" class="btn btn-pick btn-pick-voice" id="voicePickBtn">
-              Select Voiceover
-            </button>
-            <button type="button" class="btn btn-clear" id="voiceClearBtn" title="Clear Voiceover" aria-label="Clear Voiceover" disabled>
-              ✕
-            </button>
-          </div>
-        </div>
-
-        <!-- Track 2: Background Music -->
-        <div class="track-box" id="musicBox">
-          <div class="track-top">
-            <div>
-              <div class="track-label">Track 2: Background Music</div>
-              <div class="track-hint">Ambient score (.mp3, .wav, .m4a, .ogg)</div>
-            </div>
-          </div>
-          <div class="track-meta">
-            <span class="track-filename placeholder" id="musicName">No music loaded</span>
-            <span class="track-duration" id="musicDuration">00:00</span>
-          </div>
-          <div class="track-actions">
-            <input type="file" id="musicInput" class="file-input-hidden" accept=".mp3,.wav,.m4a,.ogg,audio/*" />
-            <button type="button" class="btn btn-pick btn-pick-music" id="musicPickBtn">
-              Select Music
-            </button>
-            <button type="button" class="btn btn-clear" id="musicClearBtn" title="Clear Music" aria-label="Clear Music" disabled>
-              ✕
-            </button>
-          </div>
-        </div>
+      <div class="guide-step">
+        <span class="guide-num">২</span>
+        <span><strong>অটো সেটিংস:</strong> সবচেয়ে ভালো <em>Documentary</em> সেটিংস আগে থেকেই দেওয়া আছে। চাইলে প্রতিটি স্লাইডারে লেখা <strong>"সেরা ফলাফল"</strong> দেখে বদলাতে পারেন।</span>
       </div>
+      <div class="guide-step">
+        <span class="guide-num">৩</span>
+        <span><strong>প্রিভিউ ও এক্সপোর্ট:</strong> Play চেপে শুনুন, এরপর <strong>Export</strong> থেকে <strong>.WAV অডিও</strong> অথবা <strong>.MP4 ভিডিও</strong> সরাসরি সেভ করুন।</span>
+      </div>
+    </section>
 
-      <!-- Smart Length Handling -->
-      <div class="sync-row">
-        <label class="toggle-label" for="loopMusicToggle">
-          <div class="toggle-text">
-            <span class="toggle-title">Loop Background Music if shorter than Voiceover</span>
-            <span class="toggle-desc">Repeats ambient track seamlessly to match full story length</span>
+    <!-- CapCut Preview Stage -->
+    <section class="preview-stage" aria-label="Preview Player">
+      <video id="previewVideo" playsinline muted></video>
+      <div class="stage-monitor" id="stageMonitor">
+        <span class="stage-pill" id="liveDuckBadge">অডিও ফাইল লোড করুন — অটো ডাকিং প্রস্তুত</span>
+        <div class="vu-meters">
+          <div class="vu-row">
+            <span class="vu-label" style="color: var(--cyan);">ভয়েস</span>
+            <div class="vu-track"><div class="vu-fill voice" id="vuVoiceFill"></div></div>
           </div>
-          <div class="switch">
-            <input type="checkbox" id="loopMusicToggle" checked />
-            <span class="switch-slider"></span>
+          <div class="vu-row">
+            <span class="vu-label" style="color: var(--amber);">মিউজিক</span>
+            <div class="vu-track"><div class="vu-fill music" id="vuMusicFill"></div></div>
           </div>
-        </label>
-
-        <div class="control-item">
-          <div class="control-head">
-            <div>
-              <div class="control-name">Outro Tail Fade-Out</div>
-              <div class="control-sub">Smooth music fade-out after voiceover finishes</div>
-            </div>
-            <span class="control-value amber" id="outroTailVal">2.0 s</span>
-          </div>
-          <input type="range" id="outroTailSlider" class="amber-slider" min="0" max="5" step="0.5" value="2.0" />
         </div>
       </div>
     </section>
 
-    <!-- Visual Feedback & Live Preview -->
-    <section class="card" aria-label="Waveform and Preview">
-      <div class="section-header">
-        <h2 class="section-title"><span class="dot dot-amber"></span> Waveform &amp; Ducking Curve</h2>
-        <span class="control-sub" id="duckStatePill">Ready</span>
+    <!-- CapCut Transport Strip -->
+    <section class="transport-strip" aria-label="Playback Transport">
+      <span class="timecode" id="timeDisplay">00:00 / 00:00</span>
+      <div class="transport-center">
+        <button type="button" class="btn-circle btn-stop-mini" id="stopBtn" disabled title="Stop & Rewind" aria-label="Stop">■</button>
+        <button type="button" class="btn-circle btn-play-main" id="playPauseBtn" disabled title="Play or Pause" aria-label="Play or Pause">▶</button>
       </div>
+      <button type="button" class="btn-reset-mini" id="resetBestBtn">↺ সেরা সেটিংস</button>
+    </section>
 
-      <div class="canvas-wrap">
-        <canvas id="waveformCanvas"></canvas>
-        <div class="canvas-empty" id="canvasEmptyState">
-          <strong>Load Voiceover &amp; Background Music</strong>
-          <span>The voiceover waveform and automatic music ducking curve will render here.</span>
+    <!-- CapCut Multi-Track Timeline -->
+    <section class="timeline-card" aria-label="Multi-track Timeline">
+      <div class="timeline-head">
+        <span><strong style="color: var(--cyan);">● ট্র্যাক ১: ভয়েস/ভিডিও</strong> &nbsp; <strong style="color: var(--amber);">● ট্র্যাক ২: মিউজিক ডাকিং কার্ভ</strong></span>
+        <span id="duckStatsText">আঙুল দিয়ে টেনে পজিশন বদলান</span>
+      </div>
+      <div class="timeline-wrap">
+        <canvas id="timelineCanvas"></canvas>
+        <div class="timeline-empty" id="timelineEmpty">
+          <strong>নিচের "ট্র্যাক" ট্যাব থেকে ভয়েস ও মিউজিক যোগ করুন</strong>
+          <span>এখানে ক্যাপকাটের মতো ভয়েস ওয়েভফর্ম ও মিউজিক ডাউন কার্ভ দেখা যাবে</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 1: TRACKS -->
+    <section class="tool-panel active" id="panel-tracks">
+      <h2 class="panel-title">১. অডিও / ভিডিও ট্র্যাক যোগ করুন <span class="badge-dur" id="mixLengthBadge">মোট: 00:00</span></h2>
+      <p class="panel-intro">ভয়েসের সাথে মিউজিক সিঙ্ক করতে নিচের দুটি বক্সে ফাইল দিন।</p>
+
+      <!-- Track 1 -->
+      <div class="track-card" id="voiceCard">
+        <div class="param-top">
+          <span class="param-name">ট্র্যাক ১: ভয়েসওভার বা MP4 ভিডিও</span>
+          <span class="badge-dur" id="voiceDur">00:00</span>
+        </div>
+        <p class="param-help"><strong>কাজ কী:</strong> আপনার মূল কথা (MP3/WAV/M4A/OGG) অথবা সরাসরি MP4 ভিডিও দিন। এই শব্দ শুনেই মিউজিক আপনাআপনি কমবে-বাড়বে।</p>
+        <div class="track-meta">
+          <span class="track-name empty" id="voiceName">কোনো ভয়েস বা ভিডিও নেওয়া হয়নি</span>
+        </div>
+        <div class="btn-row">
+          <input type="file" id="voiceInput" class="file-hidden" accept="audio/*,video/mp4,video/*,.mp3,.wav,.m4a,.ogg,.mp4,.mov" />
+          <button type="button" class="btn btn-voice" id="voicePickBtn">＋ ভয়েস / MP4 নিন</button>
+          <button type="button" class="btn btn-clear" id="voiceClearBtn" disabled aria-label="Clear Voiceover">✕</button>
         </div>
       </div>
 
-      <div class="legend-row">
-        <div class="legend-items">
-          <span class="legend-item"><span class="swatch" style="background: var(--cyan);"></span> Voiceover</span>
-          <span class="legend-item"><span class="swatch" style="background: var(--amber);"></span> Music Gain Curve</span>
+      <!-- Track 2 -->
+      <div class="track-card" id="musicCard">
+        <div class="param-top">
+          <span class="param-name">ট্র্যাক ২: ব্যাকগ্রাউন্ড মিউজিক</span>
+          <span class="badge-dur" id="musicDur">00:00</span>
         </div>
-        <span>Tap or drag waveform to seek</span>
+        <p class="param-help"><strong>কাজ কী:</strong> কথার পেছনে হালকা বাজবে এমন মিউজিক বা অ্যাম্বিয়েন্ট সাউন্ড দিন।</p>
+        <div class="track-meta">
+          <span class="track-name empty" id="musicName">কোনো মিউজিক নেওয়া হয়নি</span>
+        </div>
+        <div class="btn-row">
+          <input type="file" id="musicInput" class="file-hidden" accept="audio/*,.mp3,.wav,.m4a,.ogg" />
+          <button type="button" class="btn btn-music" id="musicPickBtn">＋ মিউজিক নিন</button>
+          <button type="button" class="btn btn-clear" id="musicClearBtn" disabled aria-label="Clear Music">✕</button>
+        </div>
       </div>
 
-      <div class="transport-bar">
-        <div class="seek-row">
-          <input type="range" id="seekBar" min="0" max="1000" step="1" value="0" disabled aria-label="Playback seek bar" />
-          <span class="time-readout" id="timeDisplay">00:00 / 00:00</span>
+      <!-- Loop Toggle -->
+      <label class="switch-card" for="loopMusicToggle">
+        <div>
+          <div class="param-name">মিউজিক ছোট হলে অটো লুপ হবে (Loop Music)</div>
+          <p class="param-help"><strong>কাজ কী:</strong> আপনার ভয়েস ১০ মিনিটের আর মিউজিক ২ মিনিটের হলে, মিউজিকটি অটোমেটিক বারবার ঘুরে পুরো ভিডিও জুড়ে বাজবে। <strong>(সেরা: চালু রাখুন)</strong></p>
         </div>
-        <div class="transport-buttons">
-          <button type="button" class="btn btn-play" id="playPauseBtn" disabled>
-            ▶ Play Preview
+        <div class="switch">
+          <input type="checkbox" id="loopMusicToggle" checked />
+          <span class="switch-slider"></span>
+        </div>
+      </label>
+
+      <!-- Outro Tail -->
+      <div class="param-card">
+        <div class="param-top">
+          <span class="param-name">শেষের মিউজিক ফেড-আউট (Outro Tail)</span>
+          <span class="param-val amber" id="outroVal">2.0 s</span>
+        </div>
+        <p class="param-help"><strong>কাজ কী:</strong> কথা শেষ হওয়ার পর আরও কত সেকেন্ড মিউজিক ধীরে ধীরে বন্ধ হবে। এতে ভিডিও হুট করে থেমে যায় না।</p>
+        <div class="best-box">
+          <span>★ সেরা ফলাফল: <strong>1.5s – 2.5s</strong></span>
+          <span class="live-tip" id="outroTip">✓ ডকুমেন্টারির জন্য পারফেক্ট</span>
+        </div>
+        <input type="range" id="outroSlider" class="amber" min="0" max="5" step="0.5" value="2.0" />
+      </div>
+    </section>
+
+    <!-- TAB 2: VOLUME -->
+    <section class="tool-panel" id="panel-volume">
+      <h2 class="panel-title">২. ভলিউম ব্যালেন্স (Volume)</h2>
+      <p class="panel-intro">কথার সময় এবং নীরব অংশে ভয়েস ও মিউজিক কতটুকু জোরে শোনাবে তা ঠিক করুন।</p>
+
+      <div class="param-card">
+        <div class="param-top">
+          <span class="param-name">ভয়েসওভার ভলিউম (Voiceover Volume)</span>
+          <span class="param-val" id="voiceVolVal">100%</span>
+        </div>
+        <p class="param-help"><strong>কাজ কী:</strong> আপনার মূল ভয়েসকে আরও পরিষ্কার ও জোরালো করে। ভয়েস রেকর্ডিং আস্তে হলে একটু বাড়াতে পারেন।</p>
+        <div class="best-box">
+          <span>★ সেরা ফলাফল: <strong>100% – 115%</strong></span>
+          <span class="live-tip" id="voiceVolTip">✓ স্বাভাবিক ও পরিষ্কার</span>
+        </div>
+        <input type="range" id="voiceVolSlider" min="50" max="150" step="1" value="100" />
+      </div>
+
+      <div class="param-card">
+        <div class="param-top">
+          <span class="param-name">নীরব অংশে মিউজিক (Normal Music)</span>
+          <span class="param-val amber" id="normalVolVal">60%</span>
+        </div>
+        <p class="param-help"><strong>কাজ কী:</strong> যখন কোনো কথা থাকবে না (শুরুতে, মাঝে বা শেষে), তখন মিউজিক কতটুকু জোরে বাজবে।</p>
+        <div class="best-box">
+          <span>★ সেরা ফলাফল: <strong>55% – 70%</strong></span>
+          <span class="live-tip" id="normalVolTip">✓ সুন্দর আবহ তৈরি হবে</span>
+        </div>
+        <input type="range" id="normalVolSlider" class="amber" min="10" max="100" step="1" value="60" />
+      </div>
+
+      <div class="param-card">
+        <div class="param-top">
+          <span class="param-name">কথার সময় মিউজিক (Ducked Music)</span>
+          <span class="param-val amber" id="duckVolVal">15%</span>
+        </div>
+        <p class="param-help"><strong>কাজ কী:</strong> আপনি কথা বলা শুরু করলে মিউজিক অটোমেটিক কমে কতটুকুতে নেমে আসবে।</p>
+        <div class="best-box">
+          <span>★ সেরা ফলাফল: <strong>12% – 18%</strong></span>
+          <span class="live-tip" id="duckVolTip">✓ কথা একদম স্পষ্ট শোনাবে</span>
+        </div>
+        <input type="range" id="duckVolSlider" class="amber" min="0" max="50" step="1" value="15" />
+      </div>
+    </section>
+
+    <!-- TAB 3: AUTO DUCK -->
+    <section class="tool-panel" id="panel-duck">
+      <h2 class="panel-title">৩. অটো ডাকিং সেন্সিটিভিটি (Auto Duck)</h2>
+      <p class="panel-intro">কখন মিউজিক নামবে আর ছোট বিরতিতে কেমন ধরে রাখবে—এটা এখানে নিয়ন্ত্রণ হয়।</p>
+
+      <div class="param-card">
+        <div class="param-top">
+          <span class="param-name">ভয়েস থ্রেশহোল্ড (Voice Threshold)</span>
+          <span class="param-val" id="thresholdVal">-32 dB</span>
+        </div>
+        <p class="param-help"><strong>কাজ কী:</strong> ভয়েস কতটুকু জোরে হলে মিউজিক কমানো শুরু হবে। বাতাসের আওয়াজে মিউজিক কমে গেলে মান বাড়ান (ডানে নিন), আর আস্তে কথায় না কমলে বামে নিন।</p>
+        <div class="best-box">
+          <span>★ সেরা ফলাফল: <strong>-35 dB থেকে -28 dB</strong></span>
+          <span class="live-tip" id="thresholdTip">✓ বেশিরভাগ ভয়েসের জন্য সেরা</span>
+        </div>
+        <input type="range" id="thresholdSlider" min="-50" max="-10" step="1" value="-32" />
+      </div>
+
+      <div class="param-card">
+        <div class="param-top">
+          <span class="param-name">হোল্ড টাইম / বিরতি সুরক্ষা (Hold Time)</span>
+          <span class="param-val" id="holdTimeVal">0.6 s</span>
+        </div>
+        <p class="param-help"><strong>কাজ কী:</strong> কথার মাঝে শ্বাস বা ১ সেকেন্ডের বিরতি নিলে মিউজিক যেন হঠাৎ লাফ দিয়ে উঠে না যায়, সেজন্য এই সময়টুকু মিউজিক নিচে ধরে রাখে।</p>
+        <div class="best-box">
+          <span>★ সেরা ফলাফল: <strong>0.5s – 0.8s</strong></span>
+          <span class="live-tip" id="holdTip">✓ পাম্পিং হবে না, প্রফেশনাল শোনাবে</span>
+        </div>
+        <input type="range" id="holdTimeSlider" min="0.1" max="2.0" step="0.05" value="0.6" />
+      </div>
+    </section>
+
+    <!-- TAB 4: SMOOTHNESS & PRESETS -->
+    <section class="tool-panel" id="panel-smooth">
+      <h2 class="panel-title">৪. স্মুথনেস ও প্রিসেট (Smooth &amp; Presets)</h2>
+      <p class="panel-intro">মিউজিক নামা-ওঠা কতটা মোলায়েম হবে তা ঠিক করুন, অথবা ১-ট্যাপ প্রিসেট বেছে নিন।</p>
+
+      <div class="param-card">
+        <div class="param-top">
+          <span class="param-name">স্মুথনেস (Attack / Release Speed)</span>
+          <span class="param-val amber" id="smoothVal">Medium</span>
+        </div>
+        <p class="param-help"><strong>কাজ কী:</strong> ভয়েস এলে মিউজিক কত নরমভাবে নামবে এবং কথা শেষ হলে কত ধীরে উপরে উঠবে (<span id="smoothMs">Atk 180ms / Rel 700ms</span>)।</p>
+        <div class="best-box">
+          <span>★ সেরা ফলাফল: <strong>Medium (3.0) – Smooth (4.0)</strong></span>
+          <span class="live-tip" id="smoothTip">✓ গল্প ও ডকুমেন্টারির জন্য আদর্শ</span>
+        </div>
+        <input type="range" id="smoothSlider" class="amber" min="1" max="5" step="0.5" value="3" />
+      </div>
+
+      <div class="param-card">
+        <span class="param-name">১-ট্যাপ রেডিমেড প্রিসেট (নতুনদের জন্য)</span>
+        <p class="param-help">নিজে সেটিংস না বুঝলে এখান থেকে আপনার ভিডিওর ধরন অনুযায়ী যেকোনো একটি চাপুন:</p>
+        <div class="presets-grid">
+          <button type="button" class="preset-btn active" data-preset="doc">
+            <span class="preset-name">🎬 Documentary (সেরা)</span>
+            <span class="preset-desc">Normal 60% • Duck 15% • Hold 0.6s</span>
           </button>
-          <button type="button" class="btn btn-stop" id="stopBtn" disabled>
-            ■ Stop
+          <button type="button" class="preset-btn" data-preset="story">
+            <span class="preset-name">📖 Storytelling</span>
+            <span class="preset-desc">Normal 65% • Duck 18% • Smooth</span>
+          </button>
+          <button type="button" class="preset-btn" data-preset="podcast">
+            <span class="preset-name">🎙️ Podcast / News</span>
+            <span class="preset-desc">Normal 50% • Duck 10% • Fast</span>
+          </button>
+          <button type="button" class="preset-btn" data-preset="cinema">
+            <span class="preset-name">🌌 Cinematic Drama</span>
+            <span class="preset-desc">Normal 75% • Duck 22% • Hold 0.9s</span>
           </button>
         </div>
       </div>
     </section>
 
-    <!-- Essential Ducking Controls -->
-    <section class="card" aria-label="Auto Ducking Controls">
-      <div class="section-header">
-        <h2 class="section-title"><span class="dot dot-cyan"></span> Ducking Controls</h2>
-        <div class="presets-row">
-          <button type="button" class="preset-chip active" data-preset="doc">Documentary</button>
-          <button type="button" class="preset-chip" data-preset="podcast">Podcast</button>
-          <button type="button" class="preset-chip" data-preset="cinema">Cinematic</button>
+    <!-- TAB 5: EXPORT (WAV & MP4) -->
+    <section class="tool-panel" id="panel-export">
+      <h2 class="panel-title">৫. ফাইনাল এক্সপোর্ট (WAV ও MP4)</h2>
+      <p class="panel-intro">আপনার মিক্স করা প্রজেক্টটি অডিও (.WAV) বা ভিডিও (.MP4) হিসেবে সেভ করুন।</p>
+
+      <div class="format-grid">
+        <button type="button" class="format-card active" data-format="mp4" id="fmtMp4Btn">
+          <span class="param-name">🎬 .MP4 ভিডিও</span>
+          <span class="param-help">YouTube, Reels, TikTok বা গ্যালারির জন্য রেডি ভিডিও</span>
+          <span class="live-tip" style="font-size:11px;">সেরা: সরাসরি শেয়ার করতে</span>
+        </button>
+        <button type="button" class="format-card" data-format="wav" id="fmtWavBtn">
+          <span class="param-name">🎵 .WAV অডিও</span>
+          <span class="param-help">হাই-কোয়ালিটি ১৬-বিট স্টুডিও অডিও (CapCut/Premiere-এ নিতে)</span>
+          <span class="live-tip" style="font-size:11px;">সেরা: আলাদা এডিটিংয়ের জন্য</span>
+        </button>
+      </div>
+
+      <div class="param-card" id="mp4AspectCard">
+        <div class="param-top">
+          <span class="param-name">ভিডিও সাইজ (MP4 Aspect Ratio)</span>
+          <span class="badge-dur" id="mp4ModeBadge">Audio → Studio Video</span>
+        </div>
+        <p class="param-help" id="mp4AspectHelp"><strong>কাজ কী:</strong> আপনি শুধু অডিও দিলে সুন্দর ওয়েভফর্মসহ ভিডিও তৈরি হবে। আর ট্র্যাক ১-এ MP4 ভিডিও দিয়ে থাকলে মূল ভিডিও অটুট রেখে শুধু অডিও বদলে যাবে।</p>
+        <div class="aspect-row" id="aspectButtonsRow">
+          <button type="button" class="aspect-chip active" data-aspect="16:9">16:9 YouTube</button>
+          <button type="button" class="aspect-chip" data-aspect="9:16">9:16 Reels/Shorts</button>
+          <button type="button" class="aspect-chip" data-aspect="1:1">1:1 Square</button>
         </div>
       </div>
 
-      <div class="controls-grid">
-        <div class="control-item">
-          <div class="control-head">
-            <div>
-              <div class="control-name">Voiceover Volume</div>
-              <div class="control-sub">Boost or trim narration gain</div>
-            </div>
-            <span class="control-value" id="voiceVolVal">100%</span>
-          </div>
-          <input type="range" id="voiceVolSlider" min="50" max="150" step="1" value="100" />
-        </div>
-
-        <div class="control-item">
-          <div class="control-head">
-            <div>
-              <div class="control-name">Normal Music Volume</div>
-              <div class="control-sub">Music level during silence</div>
-            </div>
-            <span class="control-value amber" id="normalVolVal">60%</span>
-          </div>
-          <input type="range" id="normalVolSlider" class="amber-slider" min="10" max="100" step="1" value="60" />
-        </div>
-
-        <div class="control-item">
-          <div class="control-head">
-            <div>
-              <div class="control-name">Ducked Music Volume</div>
-              <div class="control-sub">Music level while speaking</div>
-            </div>
-            <span class="control-value amber" id="duckVolVal">15%</span>
-          </div>
-          <input type="range" id="duckVolSlider" class="amber-slider" min="0" max="50" step="1" value="15" />
-        </div>
-
-        <div class="control-item">
-          <div class="control-head">
-            <div>
-              <div class="control-name">Voice Threshold</div>
-              <div class="control-sub">Sensitivity to trigger ducking</div>
-            </div>
-            <span class="control-value" id="thresholdVal">-32 dB</span>
-          </div>
-          <input type="range" id="thresholdSlider" min="-50" max="-10" step="1" value="-32" />
-        </div>
-
-        <div class="control-item">
-          <div class="control-head">
-            <div>
-              <div class="control-name">Hold Time (Pause Protection)</div>
-              <div class="control-sub">Prevents pumping on breaths/pauses</div>
-            </div>
-            <span class="control-value" id="holdTimeVal">0.6 s</span>
-          </div>
-          <input type="range" id="holdTimeSlider" min="0.1" max="2.0" step="0.05" value="0.6" />
-        </div>
-
-        <div class="control-item">
-          <div class="control-head">
-            <div>
-              <div class="control-name">Smoothness (Attack / Release)</div>
-              <div class="control-sub" id="smoothSub">Atk 140ms / Rel 650ms</div>
-            </div>
-            <span class="control-value amber" id="smoothVal">Medium</span>
-          </div>
-          <input type="range" id="smoothSlider" class="amber-slider" min="1" max="5" step="0.5" value="3" />
-        </div>
-      </div>
-    </section>
-
-    <!-- Fast Offline Render & WAV Export -->
-    <section class="card export-card" aria-label="Export Audio">
-      <div class="section-header">
-        <h2 class="section-title"><span class="dot dot-emerald"></span> Offline Render &amp; Export</h2>
-        <span class="control-sub">16-bit Stereo PCM WAV</span>
-      </div>
-
-      <button type="button" class="btn btn-export" id="exportBtn" disabled>
-        ⬇ Export Mixed Audio (.WAV)
+      <button type="button" class="btn btn-export-go" id="exportBtn" disabled>
+        ⬇ Export .MP4 Video সেভ করুন
       </button>
 
-      <div class="status-banner" id="exportStatus">
-        <span id="exportStatusText">Preparing offline render...</span>
-        <div class="progress-track">
-          <div class="progress-fill" id="exportProgressBar"></div>
-        </div>
+      <div class="export-status" id="exportStatus">
+        <span id="exportStatusText">অফলাইন রেন্ডারিং চলছে...</span>
+        <div class="prog-bar"><div class="prog-fill" id="exportProgressBar"></div></div>
       </div>
     </section>
   </main>
+
+  <!-- CapCut Bottom Tool Navigation -->
+  <nav class="cap-bottom-bar" aria-label="Editor Tools">
+    <button type="button" class="cap-tab active" data-tab="tracks">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+      <span>ট্র্যাক</span>
+    </button>
+    <button type="button" class="cap-tab" data-tab="volume">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+      <span>ভলিউম</span>
+    </button>
+    <button type="button" class="cap-tab" data-tab="duck">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M2 12h4l3-7 4 14 3-7h6"/></svg>
+      <span>ডাকিং</span>
+    </button>
+    <button type="button" class="cap-tab" data-tab="smooth">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M4 17c4 0 5-10 8-10s4 10 8 10"/></svg>
+      <span>স্মুথ</span>
+    </button>
+    <button type="button" class="cap-tab" data-tab="export">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      <span>এক্সপোর্ট</span>
+    </button>
+  </nav>
 
   <script>
     (function () {
       "use strict";
 
-      const CHUNK_SEC = 0.02; // 20ms RMS analysis frames
+      const CHUNK_SEC = 0.02;
 
       const state = {
         audioCtx: null,
@@ -942,12 +1157,13 @@
         musicBuffer: null,
         voiceFileName: "",
         musicFileName: "",
+        voiceIsVideo: false,
+        voiceVideoUrl: null,
         voiceRmsDb: new Float32Array(0),
         voicePeaks: new Float32Array(0),
         gainCurve: new Float32Array(0),
         totalDuration: 0,
 
-        // Parameters
         voiceVol: 1.0,
         normalVol: 0.60,
         duckVol: 0.15,
@@ -957,7 +1173,9 @@
         outroTailSec: 2.0,
         loopMusic: true,
 
-        // Playback state
+        exportFormat: "mp4",
+        aspectMode: "16:9",
+
         isPlaying: false,
         playOffset: 0,
         playStartCtxTime: 0,
@@ -966,88 +1184,125 @@
         voiceGainNode: null,
         musicGainNode: null,
         rafId: null,
-        isSeeking: false,
         isRendering: false
       };
 
-      // DOM elements
       const el = {
+        guideToggleBtn: document.getElementById("guideToggleBtn"),
+        guideDrawer: document.getElementById("guideDrawer"),
+        topExportBtn: document.getElementById("topExportBtn"),
+
+        previewVideo: document.getElementById("previewVideo"),
+        stageMonitor: document.getElementById("stageMonitor"),
+        liveDuckBadge: document.getElementById("liveDuckBadge"),
+        vuVoiceFill: document.getElementById("vuVoiceFill"),
+        vuMusicFill: document.getElementById("vuMusicFill"),
+
+        timeDisplay: document.getElementById("timeDisplay"),
+        playPauseBtn: document.getElementById("playPauseBtn"),
+        stopBtn: document.getElementById("stopBtn"),
+        resetBestBtn: document.getElementById("resetBestBtn"),
+
+        canvas: document.getElementById("timelineCanvas"),
+        timelineEmpty: document.getElementById("timelineEmpty"),
+        duckStatsText: document.getElementById("duckStatsText"),
+
         voiceInput: document.getElementById("voiceInput"),
         musicInput: document.getElementById("musicInput"),
         voicePickBtn: document.getElementById("voicePickBtn"),
         musicPickBtn: document.getElementById("musicPickBtn"),
         voiceClearBtn: document.getElementById("voiceClearBtn"),
         musicClearBtn: document.getElementById("musicClearBtn"),
-        voiceBox: document.getElementById("voiceBox"),
-        musicBox: document.getElementById("musicBox"),
+        voiceCard: document.getElementById("voiceCard"),
+        musicCard: document.getElementById("musicCard"),
         voiceName: document.getElementById("voiceName"),
         musicName: document.getElementById("musicName"),
-        voiceDuration: document.getElementById("voiceDuration"),
-        musicDuration: document.getElementById("musicDuration"),
-        outputLengthBadge: document.getElementById("outputLengthBadge"),
+        voiceDur: document.getElementById("voiceDur"),
+        musicDur: document.getElementById("musicDur"),
+        mixLengthBadge: document.getElementById("mixLengthBadge"),
 
         loopMusicToggle: document.getElementById("loopMusicToggle"),
-        outroTailSlider: document.getElementById("outroTailSlider"),
-        outroTailVal: document.getElementById("outroTailVal"),
-
-        canvas: document.getElementById("waveformCanvas"),
-        canvasEmptyState: document.getElementById("canvasEmptyState"),
-        duckStatePill: document.getElementById("duckStatePill"),
-        seekBar: document.getElementById("seekBar"),
-        timeDisplay: document.getElementById("timeDisplay"),
-        playPauseBtn: document.getElementById("playPauseBtn"),
-        stopBtn: document.getElementById("stopBtn"),
+        outroSlider: document.getElementById("outroSlider"),
+        outroVal: document.getElementById("outroVal"),
+        outroTip: document.getElementById("outroTip"),
 
         voiceVolSlider: document.getElementById("voiceVolSlider"),
         voiceVolVal: document.getElementById("voiceVolVal"),
+        voiceVolTip: document.getElementById("voiceVolTip"),
+
         normalVolSlider: document.getElementById("normalVolSlider"),
         normalVolVal: document.getElementById("normalVolVal"),
+        normalVolTip: document.getElementById("normalVolTip"),
+
         duckVolSlider: document.getElementById("duckVolSlider"),
         duckVolVal: document.getElementById("duckVolVal"),
+        duckVolTip: document.getElementById("duckVolTip"),
+
         thresholdSlider: document.getElementById("thresholdSlider"),
         thresholdVal: document.getElementById("thresholdVal"),
+        thresholdTip: document.getElementById("thresholdTip"),
+
         holdTimeSlider: document.getElementById("holdTimeSlider"),
         holdTimeVal: document.getElementById("holdTimeVal"),
+        holdTip: document.getElementById("holdTip"),
+
         smoothSlider: document.getElementById("smoothSlider"),
         smoothVal: document.getElementById("smoothVal"),
-        smoothSub: document.getElementById("smoothSub"),
+        smoothMs: document.getElementById("smoothMs"),
+        smoothTip: document.getElementById("smoothTip"),
 
+        fmtMp4Btn: document.getElementById("fmtMp4Btn"),
+        fmtWavBtn: document.getElementById("fmtWavBtn"),
+        mp4AspectCard: document.getElementById("mp4AspectCard"),
+        mp4ModeBadge: document.getElementById("mp4ModeBadge"),
+        aspectButtonsRow: document.getElementById("aspectButtonsRow"),
         exportBtn: document.getElementById("exportBtn"),
         exportStatus: document.getElementById("exportStatus"),
         exportStatusText: document.getElementById("exportStatusText"),
         exportProgressBar: document.getElementById("exportProgressBar"),
-        presetChips: Array.from(document.querySelectorAll(".preset-chip"))
+
+        tabs: Array.from(document.querySelectorAll(".cap-tab")),
+        panels: Array.from(document.querySelectorAll(".tool-panel")),
+        presetBtns: Array.from(document.querySelectorAll(".preset-btn")),
+        aspectChips: Array.from(document.querySelectorAll(".aspect-chip"))
       };
 
-      function getOrCreateAudioContext() {
+      function switchTab(tabName) {
+        el.tabs.forEach((t) => t.classList.toggle("active", t.dataset.tab === tabName));
+        el.panels.forEach((p) => p.classList.toggle("active", p.id === "panel-" + tabName));
+      }
+
+      el.tabs.forEach((tab) => tab.addEventListener("click", () => switchTab(tab.dataset.tab)));
+      el.topExportBtn.addEventListener("click", () => switchTab("export"));
+      el.guideToggleBtn.addEventListener("click", () => {
+        el.guideToggleBtn.classList.toggle("active");
+        el.guideDrawer.classList.toggle("open");
+      });
+
+      function getOrCreateCtx() {
         if (!state.audioCtx) {
-          const AudioCtx = window.AudioContext || window.webkitAudioContext;
-          state.audioCtx = new AudioCtx();
+          const Ctx = window.AudioContext || window.webkitAudioContext;
+          state.audioCtx = new Ctx();
         }
         return state.audioCtx;
       }
 
       async function ensureAudioResumed() {
-        const ctx = getOrCreateAudioContext();
-        if (ctx.state === "suspended") {
-          await ctx.resume();
-        }
+        const ctx = getOrCreateCtx();
+        if (ctx.state === "suspended") await ctx.resume();
         return ctx;
       }
 
       function formatTime(sec) {
         if (!isFinite(sec) || sec < 0) sec = 0;
-        const totalSec = Math.floor(sec);
-        const mins = Math.floor(totalSec / 60);
-        const secs = totalSec % 60;
-        return String(mins).padStart(2, "0") + ":" + String(secs).padStart(2, "0");
+        const t = Math.floor(sec);
+        return String(Math.floor(t / 60)).padStart(2, "0") + ":" + String(t % 60).padStart(2, "0");
       }
 
       function getAttackRelease(level) {
-        // Maps 1.0..5.0 smoothness slider to attack/release times in seconds
-        const t = (level - 1) / 4; // 0..1
-        const attackSec = 0.04 + t * 0.28;   // 40ms .. 320ms
-        const releaseSec = 0.20 + t * 1.00;  // 200ms .. 1200ms
+        const t = (level - 1) / 4;
+        const attackSec = 0.04 + t * 0.28;
+        const releaseSec = 0.20 + t * 1.00;
         let label = "Medium";
         if (level <= 1.5) label = "Fast";
         else if (level <= 2.5) label = "Tight";
@@ -1057,65 +1312,81 @@
         return { attackSec, releaseSec, label };
       }
 
+      function updateBeginnerTips() {
+        const vv = Math.round(state.voiceVol * 100);
+        el.voiceVolTip.textContent = vv > 130 ? "⚠ খুব বেশি — ভয়েস ফেটে যেতে পারে" : (vv < 80 ? "⚠ ভয়েস একটু আস্তে হতে পারে" : "✓ স্বাভাবিক ও পরিষ্কার");
+        el.voiceVolTip.className = "live-tip" + (vv > 130 || vv < 80 ? " warn" : "");
+
+        const nv = Math.round(state.normalVol * 100);
+        el.normalVolTip.textContent = nv > 85 ? "⚠ নীরব অংশে অনেক জোরে হতে পারে" : "✓ সুন্দর আবহ তৈরি হবে";
+        el.normalVolTip.className = "live-tip" + (nv > 85 ? " warn" : "");
+
+        const dv = Math.round(state.duckVol * 100);
+        el.duckVolTip.textContent = dv > 28 ? "⚠ বেশি জোরে হলে কথা চাপা পড়বে" : "✓ কথা একদম স্পষ্ট শোনাবে";
+        el.duckVolTip.className = "live-tip" + (dv > 28 ? " warn" : "");
+
+        const th = state.thresholdDb;
+        el.thresholdTip.textContent = th > -20 ? "⚠ খুব কম ডাকিং হবে (-32 dB ভালো)" : (th < -42 ? "⚠ বাতাসের শব্দেও কমে যেতে পারে" : "✓ বেশিরভাগ ভয়েসের জন্য সেরা");
+        el.thresholdTip.className = "live-tip" + (th > -20 || th < -42 ? " warn" : "");
+
+        const ht = state.holdTimeSec;
+        el.holdTip.textContent = ht < 0.35 ? "⚠ শ্বাসের বিরতিতে মিউজিক কাঁপতে পারে" : "✓ পাম্পিং হবে না, প্রফেশনাল শোনাবে";
+        el.holdTip.className = "live-tip" + (ht < 0.35 ? " warn" : "");
+
+        el.outroTip.textContent = state.outroTailSec < 1 ? "⚠ শেষে মিউজিক হঠাৎ থামবে" : "✓ ডকুমেন্টারির জন্য পারফেক্ট";
+        el.outroTip.className = "live-tip" + (state.outroTailSec < 1 ? " warn" : "");
+      }
+
       function analyzeVoiceoverEnvelope(buffer) {
-        const sampleRate = buffer.sampleRate;
-        const numChannels = buffer.numberOfChannels;
-        const windowSamples = Math.max(1, Math.floor(sampleRate * CHUNK_SEC));
-        const frameCount = Math.max(1, Math.ceil(buffer.length / windowSamples));
+        const sr = buffer.sampleRate;
+        const chCount = buffer.numberOfChannels;
+        const win = Math.max(1, Math.floor(sr * CHUNK_SEC));
+        const frames = Math.max(1, Math.ceil(buffer.length / win));
+        const rmsDb = new Float32Array(frames);
+        const peaks = new Float32Array(frames);
 
-        const rmsDb = new Float32Array(frameCount);
-        const peaks = new Float32Array(frameCount);
+        const chs = [];
+        for (let c = 0; c < chCount; c++) chs.push(buffer.getChannelData(c));
 
-        const channels = [];
-        for (let c = 0; c < numChannels; c++) {
-          channels.push(buffer.getChannelData(c));
-        }
-
-        for (let f = 0; f < frameCount; f++) {
-          const start = f * windowSamples;
-          const end = Math.min(buffer.length, start + windowSamples);
+        for (let f = 0; f < frames; f++) {
+          const start = f * win;
+          const end = Math.min(buffer.length, start + win);
           const count = end - start;
-          if (count <= 0) {
-            rmsDb[f] = -120;
-            peaks[f] = 0;
-            continue;
-          }
-
+          if (count <= 0) { rmsDb[f] = -120; peaks[f] = 0; continue; }
           let sumSq = 0;
-          let maxPeak = 0;
-          for (let c = 0; c < numChannels; c++) {
-            const data = channels[c];
+          let maxP = 0;
+          for (let c = 0; c < chCount; c++) {
+            const d = chs[c];
             for (let i = start; i < end; i++) {
-              const s = data[i];
+              const s = d[i];
               sumSq += s * s;
-              const abs = s < 0 ? -s : s;
-              if (abs > maxPeak) maxPeak = abs;
+              const a = s < 0 ? -s : s;
+              if (a > maxP) maxP = a;
             }
           }
-
-          const rms = Math.sqrt(sumSq / (count * numChannels));
+          const rms = Math.sqrt(sumSq / (count * chCount));
           rmsDb[f] = rms > 1e-6 ? 20 * Math.log10(rms) : -120;
-          peaks[f] = maxPeak;
+          peaks[f] = maxP;
         }
-
         state.voiceRmsDb = rmsDb;
         state.voicePeaks = peaks;
       }
 
       function computeDuckCurve() {
+        updateBeginnerTips();
         if (!state.voiceBuffer) {
           state.gainCurve = new Float32Array(0);
           state.totalDuration = state.musicBuffer ? state.musicBuffer.duration : 0;
-          updateTrackUI();
-          drawWaveform();
+          updateUI();
+          drawTimeline();
           return;
         }
 
-        const voiceDuration = state.voiceBuffer.duration;
-        const totalDuration = voiceDuration + state.outroTailSec;
-        state.totalDuration = totalDuration;
+        const voiceDur = state.voiceBuffer.duration;
+        const totalDur = voiceDur + state.outroTailSec;
+        state.totalDuration = totalDur;
 
-        const totalFrames = Math.max(2, Math.ceil(totalDuration / CHUNK_SEC));
+        const totalFrames = Math.max(2, Math.ceil(totalDur / CHUNK_SEC));
         const voiceFrames = state.voiceRmsDb.length;
         const curve = new Float32Array(totalFrames);
 
@@ -1123,124 +1394,88 @@
         const attackCoeff = 1 - Math.exp(-CHUNK_SEC / Math.max(0.012, attackSec / 3));
         const releaseCoeff = 1 - Math.exp(-CHUNK_SEC / Math.max(0.025, releaseSec / 3));
 
-        // Ensure duck volume never exceeds normal volume
-        const effectiveNormal = state.normalVol;
-        const effectiveDuck = Math.min(state.duckVol, effectiveNormal);
-
-        let holdRemaining = 0;
-        let currentGain = effectiveNormal;
-        let duckedFrameCount = 0;
+        const effNorm = state.normalVol;
+        const effDuck = Math.min(state.duckVol, effNorm);
+        let holdRem = 0;
+        let curGain = effNorm;
+        let duckCount = 0;
 
         for (let i = 0; i < totalFrames; i++) {
           const t = i * CHUNK_SEC;
-          const hasSpeech = i < voiceFrames && state.voiceRmsDb[i] >= state.thresholdDb;
+          const speech = i < voiceFrames && state.voiceRmsDb[i] >= state.thresholdDb;
+          if (speech) holdRem = state.holdTimeSec;
+          else if (holdRem > 0) holdRem = Math.max(0, holdRem - CHUNK_SEC);
 
-          if (hasSpeech) {
-            holdRemaining = state.holdTimeSec;
-          } else if (holdRemaining > 0) {
-            holdRemaining = Math.max(0, holdRemaining - CHUNK_SEC);
+          const target = (speech || holdRem > 0) ? effDuck : effNorm;
+          if (target < effNorm - 0.001) duckCount++;
+
+          if (i === 0) curGain = target;
+          else curGain += (target - curGain) * (target < curGain ? attackCoeff : releaseCoeff);
+
+          let outGain = curGain;
+          if (state.outroTailSec > 0 && t > voiceDur) {
+            const p = Math.min(1, (t - voiceDur) / state.outroTailSec);
+            outGain *= 0.5 * (1 + Math.cos(Math.PI * p));
+          } else if (state.outroTailSec === 0 && t > voiceDur - 0.03) {
+            const p = Math.min(1, Math.max(0, (t - (voiceDur - 0.03)) / 0.03));
+            outGain *= (1 - p);
           }
-
-          const targetGain = (hasSpeech || holdRemaining > 0) ? effectiveDuck : effectiveNormal;
-          if (targetGain < effectiveNormal - 0.001) {
-            duckedFrameCount++;
-          }
-
-          if (i === 0) {
-            currentGain = targetGain;
-          } else {
-            const coeff = targetGain < currentGain ? attackCoeff : releaseCoeff;
-            currentGain += (targetGain - currentGain) * coeff;
-          }
-
-          let finalGain = currentGain;
-          if (state.outroTailSec > 0 && t > voiceDuration) {
-            const progress = Math.min(1, (t - voiceDuration) / state.outroTailSec);
-            const fadeFactor = 0.5 * (1 + Math.cos(Math.PI * progress));
-            finalGain *= fadeFactor;
-          } else if (state.outroTailSec === 0 && t > voiceDuration - 0.03) {
-            const progress = Math.min(1, Math.max(0, (t - (voiceDuration - 0.03)) / 0.03));
-            finalGain *= (1 - progress);
-          }
-
-          curve[i] = Math.max(0.0001, finalGain);
+          curve[i] = Math.max(0.0001, outGain);
         }
-
-        // Exact zero at final sample for clean tail
         curve[totalFrames - 1] = 0;
         state.gainCurve = curve;
 
-        const duckPercent = Math.round((duckedFrameCount / totalFrames) * 100);
-        el.duckStatePill.textContent = "Ducking active " + duckPercent + "% of mix";
+        const pct = Math.round((duckCount / totalFrames) * 100);
+        el.duckStatsText.textContent = "ডাকিং: " + pct + "% সময় মিউজিক কমানো";
 
-        updateTrackUI();
-        drawWaveform();
-        if (state.isPlaying) {
-          rescheduleLiveGains();
-        }
+        updateUI();
+        drawTimeline();
+        if (state.isPlaying) rescheduleLiveGains();
       }
 
-      function updateTrackUI() {
-        const hasVoice = Boolean(state.voiceBuffer);
-        const hasMusic = Boolean(state.musicBuffer);
-        const readyToPlay = hasVoice || hasMusic;
+      function updateUI() {
+        const hasV = Boolean(state.voiceBuffer);
+        const hasM = Boolean(state.musicBuffer);
+        const ready = hasV || hasM;
 
-        el.outputLengthBadge.textContent = "Mix: " + formatTime(state.totalDuration);
-        el.seekBar.disabled = !readyToPlay;
-        el.playPauseBtn.disabled = !readyToPlay;
-        el.stopBtn.disabled = !readyToPlay;
-        el.exportBtn.disabled = !hasVoice || state.isRendering;
+        el.mixLengthBadge.textContent = "মোট: " + formatTime(state.totalDuration);
+        el.playPauseBtn.disabled = !ready;
+        el.stopBtn.disabled = !ready;
+        el.exportBtn.disabled = !hasV || state.isRendering;
+        el.timelineEmpty.style.display = ready ? "none" : "flex";
 
-        el.canvasEmptyState.style.display = readyToPlay ? "none" : "flex";
+        const shown = Math.min(state.playOffset, state.totalDuration);
+        el.timeDisplay.textContent = formatTime(shown) + " / " + formatTime(state.totalDuration);
 
-        const shownOffset = Math.min(state.playOffset, state.totalDuration);
-        el.timeDisplay.textContent = formatTime(shownOffset) + " / " + formatTime(state.totalDuration);
-        if (!state.isSeeking) {
-          el.seekBar.value = state.totalDuration > 0
-            ? Math.round((shownOffset / state.totalDuration) * 1000)
-            : 0;
+        if (state.voiceIsVideo) {
+          el.mp4ModeBadge.textContent = "Source Video + Ducked Audio";
+          el.aspectButtonsRow.style.display = "none";
+        } else {
+          el.mp4ModeBadge.textContent = "Audio → Studio Video";
+          el.aspectButtonsRow.style.display = "flex";
         }
+
+        el.exportBtn.textContent = state.exportFormat === "mp4"
+          ? "⬇ Export .MP4 Video সেভ করুন"
+          : "⬇ Export .WAV Audio সেভ করুন";
+        el.mp4AspectCard.style.display = state.exportFormat === "mp4" ? "flex" : "none";
       }
 
-      function buildSubCurveFromOffset(offsetSec) {
+      function buildSubCurve(offsetSec) {
         if (!state.gainCurve.length || state.totalDuration <= 0) {
           return new Float32Array([state.normalVol, state.normalVol]);
         }
-        const startFrame = Math.min(
-          state.gainCurve.length - 2,
-          Math.max(0, Math.floor(offsetSec / CHUNK_SEC))
-        );
-        const slice = state.gainCurve.slice(startFrame);
-        if (slice.length < 2) {
-          return new Float32Array([slice[0] || 0, 0]);
-        }
-        return slice;
+        const idx = Math.min(state.gainCurve.length - 2, Math.max(0, Math.floor(offsetSec / CHUNK_SEC)));
+        const slice = state.gainCurve.slice(idx);
+        return slice.length >= 2 ? slice : new Float32Array([slice[0] || 0, 0]);
       }
 
       function stopActiveNodes() {
-        if (state.rafId) {
-          cancelAnimationFrame(state.rafId);
-          state.rafId = null;
-        }
-        try {
-          if (state.voiceNode) {
-            state.voiceNode.onended = null;
-            state.voiceNode.stop();
-            state.voiceNode.disconnect();
-          }
-        } catch (_) {}
-        try {
-          if (state.musicNode) {
-            state.musicNode.onended = null;
-            state.musicNode.stop();
-            state.musicNode.disconnect();
-          }
-        } catch (_) {}
-        try {
-          if (state.voiceGainNode) state.voiceGainNode.disconnect();
-          if (state.musicGainNode) state.musicGainNode.disconnect();
-        } catch (_) {}
-
+        if (state.rafId) { cancelAnimationFrame(state.rafId); state.rafId = null; }
+        try { if (state.voiceNode) { state.voiceNode.stop(); state.voiceNode.disconnect(); } } catch (_) {}
+        try { if (state.musicNode) { state.musicNode.stop(); state.musicNode.disconnect(); } } catch (_) {}
+        try { if (state.voiceGainNode) state.voiceGainNode.disconnect(); } catch (_) {}
+        try { if (state.musicGainNode) state.musicGainNode.disconnect(); } catch (_) {}
         state.voiceNode = null;
         state.musicNode = null;
         state.voiceGainNode = null;
@@ -1250,125 +1485,124 @@
       function rescheduleLiveGains() {
         if (!state.isPlaying || !state.audioCtx) return;
         const now = state.audioCtx.currentTime;
-        const elapsed = Math.max(0, now - state.playStartCtxTime);
-        const currentPos = state.playOffset + elapsed;
-
+        const pos = state.playOffset + Math.max(0, now - state.playStartCtxTime);
         if (state.voiceGainNode) {
           state.voiceGainNode.gain.setTargetAtTime(state.voiceVol, now, 0.015);
         }
-
         if (state.musicGainNode) {
-          const gainParam = state.musicGainNode.gain;
+          const gp = state.musicGainNode.gain;
           try {
-            if (typeof gainParam.cancelAndHoldAtTime === "function") {
-              gainParam.cancelAndHoldAtTime(now);
-            } else {
-              gainParam.cancelScheduledValues(now);
-              gainParam.setValueAtTime(gainParam.value, now);
-            }
+            if (typeof gp.cancelAndHoldAtTime === "function") gp.cancelAndHoldAtTime(now);
+            else { gp.cancelScheduledValues(now); gp.setValueAtTime(gp.value, now); }
           } catch (_) {
-            gainParam.cancelScheduledValues(now);
-            gainParam.setValueAtTime(gainParam.value, now);
+            gp.cancelScheduledValues(now); gp.setValueAtTime(gp.value, now);
           }
-
           if (state.voiceBuffer) {
-            const remaining = Math.max(0.05, state.totalDuration - currentPos);
-            const subCurve = buildSubCurveFromOffset(currentPos);
-            subCurve[0] = gainParam.value;
-            gainParam.setValueCurveAtTime(subCurve, now + 0.004, remaining);
+            const rem = Math.max(0.05, state.totalDuration - pos);
+            const sub = buildSubCurve(pos);
+            sub[0] = gp.value;
+            gp.setValueCurveAtTime(sub, now + 0.004, rem);
           } else {
-            gainParam.setTargetAtTime(state.normalVol, now, 0.02);
+            gp.setTargetAtTime(state.normalVol, now, 0.02);
           }
+        }
+      }
+
+      function updateLiveMeters(posSec) {
+        if (!state.voiceBuffer && !state.musicBuffer) {
+          el.vuVoiceFill.style.width = "0%";
+          el.vuMusicFill.style.width = "0%";
+          return;
+        }
+        const frameIdx = Math.max(0, Math.floor(posSec / CHUNK_SEC));
+        const vPeak = (frameIdx < state.voicePeaks.length) ? Math.min(1, state.voicePeaks[frameIdx] * state.voiceVol) : 0;
+        const mGain = (frameIdx < state.gainCurve.length) ? state.gainCurve[frameIdx] : (state.musicBuffer ? state.normalVol : 0);
+
+        el.vuVoiceFill.style.width = Math.round(vPeak * 100) + "%";
+        el.vuMusicFill.style.width = Math.round(Math.min(1, mGain) * 100) + "%";
+
+        if (state.voiceBuffer && posSec > state.voiceBuffer.duration) {
+          el.liveDuckBadge.textContent = "🌙 আউট্রো ফেড-আউট চলছে";
+          el.liveDuckBadge.className = "stage-pill normal";
+        } else if (state.voiceBuffer && mGain < state.normalVol - 0.04) {
+          el.liveDuckBadge.textContent = "🎙️ ভয়েস চলছে — মিউজিক " + Math.round(mGain * 100) + "%-এ নামানো";
+          el.liveDuckBadge.className = "stage-pill ducking";
+        } else {
+          el.liveDuckBadge.textContent = "🎵 নীরব অংশ — মিউজিক " + Math.round(mGain * 100) + "%-এ বাজছে";
+          el.liveDuckBadge.className = "stage-pill normal";
         }
       }
 
       async function startPlayback(fromOffset) {
         const ctx = await ensureAudioResumed();
         stopActiveNodes();
-
         const totalDur = state.totalDuration;
         if (totalDur <= 0) return;
 
         const offset = Math.max(0, Math.min(fromOffset, Math.max(0, totalDur - 0.02)));
-        const remaining = totalDur - offset;
+        const rem = totalDur - offset;
         const startAt = ctx.currentTime + 0.03;
 
         state.playOffset = offset;
         state.playStartCtxTime = startAt;
         state.isPlaying = true;
-        el.playPauseBtn.textContent = "❚❚ Pause";
+        el.playPauseBtn.textContent = "❚❚";
 
-        // Voiceover source
-        if (state.voiceBuffer && offset < state.voiceBuffer.duration) {
-          const vNode = ctx.createBufferSource();
-          vNode.buffer = state.voiceBuffer;
-          const vGain = ctx.createGain();
-          vGain.gain.setValueAtTime(state.voiceVol, startAt);
-          vNode.connect(vGain);
-          vGain.connect(ctx.destination);
-          const vRemaining = state.voiceBuffer.duration - offset;
-          vNode.start(startAt, offset, vRemaining);
-          state.voiceNode = vNode;
-          state.voiceGainNode = vGain;
+        if (state.voiceIsVideo && el.previewVideo.src) {
+          try {
+            el.previewVideo.currentTime = Math.min(offset, el.previewVideo.duration || offset);
+            el.previewVideo.play().catch(() => {});
+          } catch (_) {}
         }
 
-        // Music source
+        if (state.voiceBuffer && offset < state.voiceBuffer.duration) {
+          const vn = ctx.createBufferSource();
+          vn.buffer = state.voiceBuffer;
+          const vg = ctx.createGain();
+          vg.gain.setValueAtTime(state.voiceVol, startAt);
+          vn.connect(vg);
+          vg.connect(ctx.destination);
+          vn.start(startAt, offset, state.voiceBuffer.duration - offset);
+          state.voiceNode = vn;
+          state.voiceGainNode = vg;
+        }
+
         if (state.musicBuffer) {
-          const mDur = state.musicBuffer.duration;
-          const shouldPlayMusic = state.loopMusic || offset < mDur;
-          if (shouldPlayMusic && mDur > 0) {
-            const mNode = ctx.createBufferSource();
-            mNode.buffer = state.musicBuffer;
-            mNode.loop = state.loopMusic;
-            if (state.loopMusic) {
-              mNode.loopStart = 0;
-              mNode.loopEnd = mDur;
-            }
-
-            const mGain = ctx.createGain();
+          const md = state.musicBuffer.duration;
+          if ((state.loopMusic || offset < md) && md > 0) {
+            const mn = ctx.createBufferSource();
+            mn.buffer = state.musicBuffer;
+            mn.loop = state.loopMusic;
+            if (state.loopMusic) { mn.loopStart = 0; mn.loopEnd = md; }
+            const mg = ctx.createGain();
             if (state.voiceBuffer && state.gainCurve.length >= 2) {
-              const subCurve = buildSubCurveFromOffset(offset);
-              mGain.gain.setValueAtTime(subCurve[0], startAt);
-              mGain.gain.setValueCurveAtTime(subCurve, startAt, Math.max(0.02, remaining));
+              const sub = buildSubCurve(offset);
+              mg.gain.setValueAtTime(sub[0], startAt);
+              mg.gain.setValueCurveAtTime(sub, startAt, Math.max(0.02, rem));
             } else {
-              mGain.gain.setValueAtTime(state.normalVol, startAt);
+              mg.gain.setValueAtTime(state.normalVol, startAt);
             }
-
-            mNode.connect(mGain);
-            mGain.connect(ctx.destination);
-
-            const mOffset = state.loopMusic ? (offset % mDur) : offset;
-            if (state.loopMusic) {
-              mNode.start(startAt, mOffset, remaining);
-            } else {
-              const mPlayDur = Math.min(remaining, mDur - mOffset);
-              if (mPlayDur > 0) {
-                mNode.start(startAt, mOffset, mPlayDur);
-              }
-            }
-
-            state.musicNode = mNode;
-            state.musicGainNode = mGain;
+            mn.connect(mg);
+            mg.connect(ctx.destination);
+            const mOff = state.loopMusic ? (offset % md) : offset;
+            if (state.loopMusic) mn.start(startAt, mOff, rem);
+            else if (md - mOff > 0) mn.start(startAt, mOff, Math.min(rem, md - mOff));
+            state.musicNode = mn;
+            state.musicGainNode = mg;
           }
         }
 
         const tick = () => {
           if (!state.isPlaying) return;
           const now = ctx.currentTime;
-          const pos = now < state.playStartCtxTime
-            ? state.playOffset
-            : state.playOffset + (now - state.playStartCtxTime);
-
+          const pos = now < state.playStartCtxTime ? state.playOffset : state.playOffset + (now - state.playStartCtxTime);
           if (pos >= state.totalDuration) {
             stopPlayback(true);
             return;
           }
-
-          if (!state.isSeeking) {
-            el.seekBar.value = Math.round((pos / state.totalDuration) * 1000);
-            el.timeDisplay.textContent = formatTime(pos) + " / " + formatTime(state.totalDuration);
-          }
-          drawWaveform(pos);
+          el.timeDisplay.textContent = formatTime(pos) + " / " + formatTime(state.totalDuration);
+          updateLiveMeters(pos);
+          drawTimeline(pos);
           state.rafId = requestAnimationFrame(tick);
         };
         state.rafId = requestAnimationFrame(tick);
@@ -1377,28 +1611,32 @@
       function pausePlayback() {
         if (!state.isPlaying || !state.audioCtx) return;
         const now = state.audioCtx.currentTime;
-        const elapsed = Math.max(0, now - state.playStartCtxTime);
-        state.playOffset = Math.min(state.totalDuration, state.playOffset + elapsed);
+        state.playOffset = Math.min(state.totalDuration, state.playOffset + Math.max(0, now - state.playStartCtxTime));
         state.isPlaying = false;
         stopActiveNodes();
-        el.playPauseBtn.textContent = "▶ Play Preview";
-        updateTrackUI();
-        drawWaveform(state.playOffset);
+        if (state.voiceIsVideo) el.previewVideo.pause();
+        el.playPauseBtn.textContent = "▶";
+        updateUI();
+        drawTimeline(state.playOffset);
       }
 
-      function stopPlayback(resetToZero) {
+      function stopPlayback(reset) {
         state.isPlaying = false;
         stopActiveNodes();
-        if (resetToZero) {
-          state.playOffset = 0;
+        if (state.voiceIsVideo) {
+          el.previewVideo.pause();
+          if (reset) { try { el.previewVideo.currentTime = 0; } catch (_) {} }
         }
-        el.playPauseBtn.textContent = "▶ Play Preview";
-        updateTrackUI();
-        drawWaveform(state.playOffset);
+        if (reset) state.playOffset = 0;
+        el.playPauseBtn.textContent = "▶";
+        el.vuVoiceFill.style.width = "0%";
+        el.vuMusicFill.style.width = "0%";
+        updateUI();
+        drawTimeline(state.playOffset);
       }
 
-      // Draw dual-layer waveform + ducking gain curve
-      function drawWaveform(playheadSec) {
+      // CapCut-style Multi-Track Timeline Canvas
+      function drawTimeline(playheadSec) {
         const canvas = el.canvas;
         const rect = canvas.getBoundingClientRect();
         if (rect.width <= 0 || rect.height <= 0) return;
@@ -1406,309 +1644,351 @@
         const dpr = Math.min(window.devicePixelRatio || 1, 2.5);
         const w = Math.floor(rect.width * dpr);
         const h = Math.floor(rect.height * dpr);
-        if (canvas.width !== w || canvas.height !== h) {
-          canvas.width = w;
-          canvas.height = h;
-        }
+        if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
 
         const ctx = canvas.getContext("2d");
         ctx.clearRect(0, 0, w, h);
 
-        // Background subtle grid
-        ctx.strokeStyle = "rgba(148, 163, 184, 0.10)";
-        ctx.lineWidth = 1 * dpr;
-        [0.25, 0.5, 0.75].forEach((ratio) => {
-          const y = Math.round(h * ratio) + 0.5;
-          ctx.beginPath();
-          ctx.moveTo(0, y);
-          ctx.lineTo(w, y);
-          ctx.stroke();
-        });
-
         const totalDur = state.totalDuration;
         if (totalDur <= 0) return;
 
-        const padTop = 10 * dpr;
-        const padBottom = 10 * dpr;
-        const drawH = h - padTop - padBottom;
-        const centerY = padTop + drawH * 0.5;
+        const lane1Top = 18 * dpr;
+        const lane1H = 56 * dpr;
+        const lane2Top = lane1Top + lane1H + 10 * dpr;
+        const lane2H = h - lane2Top - 10 * dpr;
 
-        // Outro tail highlight zone
-        if (state.voiceBuffer && state.outroTailSec > 0) {
-          const outroStartX = (state.voiceBuffer.duration / totalDur) * w;
-          ctx.fillStyle = "rgba(16, 185, 129, 0.08)";
-          ctx.fillRect(outroStartX, 0, w - outroStartX, h);
-
-          ctx.strokeStyle = "rgba(16, 185, 129, 0.45)";
-          ctx.setLineDash([4 * dpr, 4 * dpr]);
-          ctx.beginPath();
-          ctx.moveTo(outroStartX, 0);
-          ctx.lineTo(outroStartX, h);
-          ctx.stroke();
-          ctx.setLineDash([]);
+        // Time ruler ticks at top
+        ctx.fillStyle = "rgba(148, 163, 184, 0.35)";
+        ctx.font = (10 * dpr) + "px sans-serif";
+        for (let t = 0; t <= 4; t++) {
+          const x = (t / 4) * w;
+          ctx.fillRect(x, 0, 1 * dpr, 10 * dpr);
+          const lbl = formatTime((t / 4) * totalDur);
+          ctx.fillText(lbl, Math.min(w - 32 * dpr, x + 3 * dpr), 11 * dpr);
         }
 
-        // Layer 1: Voiceover waveform
-        if (state.voiceBuffer && state.voicePeaks.length > 0) {
-          const bars = Math.max(60, Math.floor(rect.width / 3));
-          const barWidth = w / bars;
+        // Lane 1 Clip Box (Voiceover / Video)
+        if (state.voiceBuffer) {
+          const vW = Math.min(w, (state.voiceBuffer.duration / totalDur) * w);
+          ctx.fillStyle = "rgba(0, 229, 255, 0.12)";
+          ctx.strokeStyle = "rgba(0, 229, 255, 0.45)";
+          ctx.lineWidth = 1.2 * dpr;
+          ctx.fillRect(0, lane1Top, vW, lane1H);
+          ctx.strokeRect(0, lane1Top, vW, lane1H);
+
+          const bars = Math.max(50, Math.floor(rect.width / 3));
+          const barW = w / bars;
           const totalFrames = Math.ceil(totalDur / CHUNK_SEC);
+          const midY = lane1Top + lane1H / 2;
 
           for (let b = 0; b < bars; b++) {
-            const frameStart = Math.floor((b / bars) * totalFrames);
-            const frameEnd = Math.max(frameStart + 1, Math.floor(((b + 1) / bars) * totalFrames));
-
-            let peak = 0;
-            let maxDb = -120;
-            for (let f = frameStart; f < frameEnd && f < state.voicePeaks.length; f++) {
-              if (state.voicePeaks[f] > peak) peak = state.voicePeaks[f];
-              if (state.voiceRmsDb[f] > maxDb) maxDb = state.voiceRmsDb[f];
+            const fs = Math.floor((b / bars) * totalFrames);
+            const fe = Math.max(fs + 1, Math.floor(((b + 1) / bars) * totalFrames));
+            let pk = 0, mdb = -120;
+            for (let f = fs; f < fe && f < state.voicePeaks.length; f++) {
+              if (state.voicePeaks[f] > pk) pk = state.voicePeaks[f];
+              if (state.voiceRmsDb[f] > mdb) mdb = state.voiceRmsDb[f];
             }
-
-            if (peak <= 0.001) continue;
-            const amp = Math.min(1, peak * state.voiceVol);
-            const barH = Math.max(2 * dpr, amp * drawH * 0.88);
-            const x = b * barWidth;
-            const isSpeech = maxDb >= state.thresholdDb;
-
-            ctx.fillStyle = isSpeech
-              ? "rgba(34, 211, 238, 0.85)"
-              : "rgba(56, 189, 248, 0.30)";
-            ctx.fillRect(x, centerY - barH / 2, Math.max(1 * dpr, barWidth - 1 * dpr), barH);
+            if (pk <= 0.001) continue;
+            const bh = Math.max(2 * dpr, Math.min(1, pk * state.voiceVol) * (lane1H - 10 * dpr));
+            ctx.fillStyle = mdb >= state.thresholdDb ? "#00E5FF" : "rgba(56, 189, 248, 0.35)";
+            ctx.fillRect(b * barW, midY - bh / 2, Math.max(1 * dpr, barW - 1 * dpr), bh);
           }
-        } else if (state.musicBuffer) {
-          // Music-only preview flat wave indicator
-          ctx.fillStyle = "rgba(245, 158, 11, 0.25)";
-          ctx.fillRect(0, centerY - 6 * dpr, w, 12 * dpr);
         }
 
-        // Layer 2: Background Music Ducking Curve
-        if (state.gainCurve.length > 1) {
-          const len = state.gainCurve.length;
-          ctx.beginPath();
-          for (let i = 0; i < len; i++) {
-            const x = (i / (len - 1)) * w;
-            const g = Math.max(0, Math.min(1, state.gainCurve[i]));
-            const y = padTop + drawH * (1 - g);
-            if (i === 0) ctx.moveTo(x, y);
-            else ctx.lineTo(x, y);
+        // Lane 2 Clip Box (Music + Ducking Gain Curve)
+        if (state.musicBuffer || state.gainCurve.length > 1) {
+          const mW = state.musicBuffer && !state.loopMusic
+            ? Math.min(w, (state.musicBuffer.duration / totalDur) * w)
+            : w;
+
+          ctx.fillStyle = "rgba(245, 158, 11, 0.09)";
+          ctx.strokeStyle = "rgba(245, 158, 11, 0.40)";
+          ctx.lineWidth = 1.2 * dpr;
+          ctx.fillRect(0, lane2Top, mW, lane2H);
+          ctx.strokeRect(0, lane2Top, mW, lane2H);
+
+          // Outro green shading
+          if (state.voiceBuffer && state.outroTailSec > 0) {
+            const ox = (state.voiceBuffer.duration / totalDur) * w;
+            ctx.fillStyle = "rgba(16, 185, 129, 0.14)";
+            ctx.fillRect(ox, lane2Top, w - ox, lane2H);
           }
 
-          // Translucent amber area fill
-          ctx.save();
-          ctx.lineTo(w, h);
-          ctx.lineTo(0, h);
-          ctx.closePath();
-          const grad = ctx.createLinearGradient(0, padTop, 0, h);
-          grad.addColorStop(0, "rgba(245, 158, 11, 0.24)");
-          grad.addColorStop(1, "rgba(245, 158, 11, 0.02)");
-          ctx.fillStyle = grad;
-          ctx.fill();
-          ctx.restore();
-
-          // Crisp ducking curve stroke
-          ctx.beginPath();
-          for (let i = 0; i < len; i++) {
-            const x = (i / (len - 1)) * w;
-            const g = Math.max(0, Math.min(1, state.gainCurve[i]));
-            const y = padTop + drawH * (1 - g);
-            if (i === 0) ctx.moveTo(x, y);
-            else ctx.lineTo(x, y);
+          if (state.gainCurve.length > 1) {
+            const len = state.gainCurve.length;
+            ctx.beginPath();
+            for (let i = 0; i < len; i++) {
+              const x = (i / (len - 1)) * w;
+              const g = Math.max(0, Math.min(1, state.gainCurve[i]));
+              const y = lane2Top + (lane2H - 4 * dpr) * (1 - g) + 2 * dpr;
+              if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+            }
+            ctx.strokeStyle = "#F59E0B";
+            ctx.lineWidth = 2.2 * dpr;
+            ctx.stroke();
           }
-          ctx.strokeStyle = "#F59E0B";
-          ctx.lineWidth = 2.2 * dpr;
-          ctx.stroke();
         }
 
-        // Playhead
-        const currentSec = typeof playheadSec === "number" ? playheadSec : state.playOffset;
-        if (totalDur > 0 && currentSec >= 0) {
-          const px = Math.max(0, Math.min(w, (currentSec / totalDur) * w));
-          ctx.strokeStyle = "#FFFFFF";
-          ctx.lineWidth = 2 * dpr;
-          ctx.beginPath();
-          ctx.moveTo(px, 0);
-          ctx.lineTo(px, h);
-          ctx.stroke();
+        // CapCut White Playhead
+        const cur = typeof playheadSec === "number" ? playheadSec : state.playOffset;
+        const px = Math.max(1 * dpr, Math.min(w - 1 * dpr, (cur / totalDur) * w));
+        ctx.strokeStyle = "#FFFFFF";
+        ctx.lineWidth = 2 * dpr;
+        ctx.beginPath();
+        ctx.moveTo(px, 0);
+        ctx.lineTo(px, h);
+        ctx.stroke();
 
-          ctx.fillStyle = "#22D3EE";
-          ctx.beginPath();
-          ctx.arc(px, 8 * dpr, 4.5 * dpr, 0, Math.PI * 2);
-          ctx.fill();
-        }
+        ctx.fillStyle = "#FFFFFF";
+        ctx.beginPath();
+        ctx.arc(px, 8 * dpr, 5 * dpr, 0, Math.PI * 2);
+        ctx.fill();
       }
 
-      async function handleFileSelection(file, type) {
+      async function handleFile(file, role) {
         if (!file) return;
-        const ctx = getOrCreateAudioContext();
+        const ctx = getOrCreateCtx();
         try {
-          if (type === "voice") {
-            el.voiceName.textContent = "Decoding " + file.name + "...";
-            el.voiceName.classList.remove("placeholder");
+          if (role === "voice") {
+            el.voiceName.textContent = "ডিকোড হচ্ছে: " + file.name;
+            el.voiceName.classList.remove("empty");
           } else {
-            el.musicName.textContent = "Decoding " + file.name + "...";
-            el.musicName.classList.remove("placeholder");
+            el.musicName.textContent = "ডিকোড হচ্ছে: " + file.name;
+            el.musicName.classList.remove("empty");
           }
 
-          const arrayBuf = await file.arrayBuffer();
-          const audioBuf = await ctx.decodeAudioData(arrayBuf);
-
+          const arr = await file.arrayBuffer();
+          const audioBuf = await ctx.decodeAudioData(arr);
           stopPlayback(true);
 
-          if (type === "voice") {
+          if (role === "voice") {
             state.voiceBuffer = audioBuf;
             state.voiceFileName = file.name;
-            el.voiceName.textContent = file.name;
-            el.voiceName.classList.remove("placeholder");
-            el.voiceDuration.textContent = formatTime(audioBuf.duration);
-            el.voiceBox.classList.add("loaded-voice");
+            const isVid = (file.type && file.type.startsWith("video/")) || /\.(mp4|mov|webm|mkv)$/i.test(file.name);
+            state.voiceIsVideo = isVid;
+            if (state.voiceVideoUrl) { URL.revokeObjectURL(state.voiceVideoUrl); state.voiceVideoUrl = null; }
+            if (isVid) {
+              state.voiceVideoUrl = URL.createObjectURL(file);
+              el.previewVideo.src = state.voiceVideoUrl;
+              el.previewVideo.style.display = "block";
+              el.stageMonitor.style.display = "none";
+            } else {
+              el.previewVideo.removeAttribute("src");
+              el.previewVideo.style.display = "none";
+              el.stageMonitor.style.display = "flex";
+            }
+            el.voiceName.textContent = (isVid ? "🎬 " : "🎙️ ") + file.name;
+            el.voiceName.classList.remove("empty");
+            el.voiceDur.textContent = formatTime(audioBuf.duration);
+            el.voiceCard.classList.add("loaded-voice");
             el.voiceClearBtn.disabled = false;
             analyzeVoiceoverEnvelope(audioBuf);
           } else {
             state.musicBuffer = audioBuf;
             state.musicFileName = file.name;
-            el.musicName.textContent = file.name;
-            el.musicName.classList.remove("placeholder");
-            el.musicDuration.textContent = formatTime(audioBuf.duration);
-            el.musicBox.classList.add("loaded-music");
+            el.musicName.textContent = "🎵 " + file.name;
+            el.musicName.classList.remove("empty");
+            el.musicDur.textContent = formatTime(audioBuf.duration);
+            el.musicCard.classList.add("loaded-music");
             el.musicClearBtn.disabled = false;
           }
-
           computeDuckCurve();
         } catch (err) {
           console.error(err);
-          if (type === "voice") {
+          if (role === "voice") {
             state.voiceBuffer = null;
-            el.voiceName.textContent = "Unsupported or corrupt audio file";
-            el.voiceName.classList.add("placeholder");
-            el.voiceDuration.textContent = "00:00";
-            el.voiceBox.classList.remove("loaded-voice");
+            state.voiceIsVideo = false;
+            el.voiceName.textContent = "ফাইলটি সাপোর্টেড নয় বা নষ্ট";
+            el.voiceName.classList.add("empty");
+            el.voiceDur.textContent = "00:00";
+            el.voiceCard.classList.remove("loaded-voice");
             el.voiceClearBtn.disabled = true;
           } else {
             state.musicBuffer = null;
-            el.musicName.textContent = "Unsupported or corrupt audio file";
-            el.musicName.classList.add("placeholder");
-            el.musicDuration.textContent = "00:00";
-            el.musicBox.classList.remove("loaded-music");
+            el.musicName.textContent = "ফাইলটি সাপোর্টেড নয় বা নষ্ট";
+            el.musicName.classList.add("empty");
+            el.musicDur.textContent = "00:00";
+            el.musicCard.classList.remove("loaded-music");
             el.musicClearBtn.disabled = true;
           }
           computeDuckCurve();
         }
       }
 
-      function clearTrack(type) {
+      function clearTrack(role) {
         stopPlayback(true);
-        if (type === "voice") {
+        if (role === "voice") {
           state.voiceBuffer = null;
           state.voiceFileName = "";
+          state.voiceIsVideo = false;
+          if (state.voiceVideoUrl) { URL.revokeObjectURL(state.voiceVideoUrl); state.voiceVideoUrl = null; }
+          el.previewVideo.removeAttribute("src");
+          el.previewVideo.style.display = "none";
+          el.stageMonitor.style.display = "flex";
+          if (window.AndroidBridge && typeof window.AndroidBridge.clearSourceVideo === "function") {
+            window.AndroidBridge.clearSourceVideo();
+          }
           state.voiceRmsDb = new Float32Array(0);
           state.voicePeaks = new Float32Array(0);
           el.voiceInput.value = "";
-          el.voiceName.textContent = "No voiceover loaded";
-          el.voiceName.classList.add("placeholder");
-          el.voiceDuration.textContent = "00:00";
-          el.voiceBox.classList.remove("loaded-voice");
+          el.voiceName.textContent = "কোনো ভয়েস বা ভিডিও নেওয়া হয়নি";
+          el.voiceName.classList.add("empty");
+          el.voiceDur.textContent = "00:00";
+          el.voiceCard.classList.remove("loaded-voice");
           el.voiceClearBtn.disabled = true;
         } else {
           state.musicBuffer = null;
           state.musicFileName = "";
           el.musicInput.value = "";
-          el.musicName.textContent = "No music loaded";
-          el.musicName.classList.add("placeholder");
-          el.musicDuration.textContent = "00:00";
-          el.musicBox.classList.remove("loaded-music");
+          el.musicName.textContent = "কোনো মিউজিক নেওয়া হয়নি";
+          el.musicName.classList.add("empty");
+          el.musicDur.textContent = "00:00";
+          el.musicCard.classList.remove("loaded-music");
           el.musicClearBtn.disabled = true;
         }
         computeDuckCurve();
       }
 
-      // Encode AudioBuffer to 16-bit Stereo PCM WAV with soft peak protection
       function encodeAudioBufferToWav(buffer) {
-        const numChannels = 2;
-        const sampleRate = buffer.sampleRate;
-        const numFrames = buffer.length;
-        const bytesPerSample = 2;
-        const blockAlign = numChannels * bytesPerSample;
-        const dataSize = numFrames * blockAlign;
-        const totalBytes = 44 + dataSize;
+        const ch = 2, sr = buffer.sampleRate, len = buffer.length;
+        const dataSize = len * ch * 2;
+        const out = new Uint8Array(44 + dataSize);
+        const v = new DataView(out.buffer);
+        function ws(o, s) { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); }
+        ws(0, "RIFF"); v.setUint32(4, 36 + dataSize, true); ws(8, "WAVE");
+        ws(12, "fmt "); v.setUint32(16, 16, true); v.setUint16(20, 1, true);
+        v.setUint16(22, ch, true); v.setUint32(24, sr, true); v.setUint32(28, sr * 4, true);
+        v.setUint16(32, 4, true); v.setUint16(34, 16, true);
+        ws(36, "data"); v.setUint32(40, dataSize, true);
 
-        const out = new Uint8Array(totalBytes);
-        const view = new DataView(out.buffer);
-
-        function writeStr(offset, str) {
-          for (let i = 0; i < str.length; i++) {
-            view.setUint8(offset + i, str.charCodeAt(i));
-          }
-        }
-
-        writeStr(0, "RIFF");
-        view.setUint32(4, 36 + dataSize, true);
-        writeStr(8, "WAVE");
-        writeStr(12, "fmt ");
-        view.setUint32(16, 16, true); // PCM chunk size
-        view.setUint16(20, 1, true);  // PCM format
-        view.setUint16(22, numChannels, true);
-        view.setUint32(24, sampleRate, true);
-        view.setUint32(28, sampleRate * blockAlign, true);
-        view.setUint16(32, blockAlign, true);
-        view.setUint16(34, 16, true); // Bits per sample
-        writeStr(36, "data");
-        view.setUint32(40, dataSize, true);
-
-        const left = buffer.getChannelData(0);
-        const right = buffer.numberOfChannels > 1 ? buffer.getChannelData(1) : left;
-
-        let pos = 44;
-        for (let i = 0; i < numFrames; i++) {
-          let l = left[i];
-          let r = right[i];
-
-          // Gentle soft-knee limiting above 0.92 to avoid digital clipping when voiceover > 100%
+        const L = buffer.getChannelData(0);
+        const R = buffer.numberOfChannels > 1 ? buffer.getChannelData(1) : L;
+        let p = 44;
+        for (let i = 0; i < len; i++) {
+          let l = L[i], r = R[i];
           if (l > 0.92) l = 0.92 + 0.08 * Math.tanh((l - 0.92) / 0.08);
           else if (l < -0.92) l = -0.92 - 0.08 * Math.tanh((-l - 0.92) / 0.08);
-
           if (r > 0.92) r = 0.92 + 0.08 * Math.tanh((r - 0.92) / 0.08);
           else if (r < -0.92) r = -0.92 - 0.08 * Math.tanh((-r - 0.92) / 0.08);
-
-          const intL = l < 0 ? Math.max(-32768, Math.round(l * 32768)) : Math.min(32767, Math.round(l * 32767));
-          const intR = r < 0 ? Math.max(-32768, Math.round(r * 32768)) : Math.min(32767, Math.round(r * 32767));
-
-          view.setInt16(pos, intL, true);
-          view.setInt16(pos + 2, intR, true);
-          pos += 4;
+          v.setInt16(p, l < 0 ? Math.max(-32768, Math.round(l * 32768)) : Math.min(32767, Math.round(l * 32767)), true);
+          v.setInt16(p + 2, r < 0 ? Math.max(-32768, Math.round(r * 32768)) : Math.min(32767, Math.round(r * 32767)), true);
+          p += 4;
         }
-
         return out;
       }
 
-      function uint8ToBase64(uint8) {
-        const CHUNK = 0x8000;
-        const parts = [];
-        for (let i = 0; i < uint8.length; i += CHUNK) {
-          parts.push(String.fromCharCode.apply(null, uint8.subarray(i, i + CHUNK)));
+      function uint8ToBase64(u8) {
+        const CHUNK = 0x8000, parts = [];
+        for (let i = 0; i < u8.length; i += CHUNK) {
+          parts.push(String.fromCharCode.apply(null, u8.subarray(i, i + CHUNK)));
         }
         return btoa(parts.join(""));
       }
 
-      async function exportMixedWav() {
-        if (!state.voiceBuffer || state.isRendering) return;
+      function downsampleArray(arr, targetLen) {
+        if (!arr || arr.length === 0) return "";
+        const res = [];
+        for (let i = 0; i < targetLen; i++) {
+          const idx = Math.min(arr.length - 1, Math.floor((i / targetLen) * arr.length));
+          res.push(arr[idx].toFixed(3));
+        }
+        return res.join(",");
+      }
 
+      window.onAndroidExportProgress = function (pct, msg, done, err) {
+        el.exportProgressBar.style.width = pct + "%";
+        el.exportStatusText.textContent = err ? ("ত্রুটি: " + err) : msg;
+        if (done) {
+          state.isRendering = false;
+          el.exportBtn.disabled = !state.voiceBuffer;
+        }
+      };
+
+      async function exportBrowserMp4Fallback(renderedBuffer, baseName) {
+        el.exportProgressBar.style.width = "70%";
+        el.exportStatusText.textContent = "ব্রাউজার ভিডিও এনকোডার প্রস্তুত হচ্ছে...";
+        const offCanvas = document.createElement("canvas");
+        offCanvas.width = state.aspectMode === "9:16" ? 540 : (state.aspectMode === "1:1" ? 640 : 960);
+        offCanvas.height = state.aspectMode === "9:16" ? 960 : (state.aspectMode === "1:1" ? 640 : 540);
+        const octx = offCanvas.getContext("2d");
+
+        const actx = await ensureAudioResumed();
+        const dest = actx.createMediaStreamDestination();
+        const src = actx.createBufferSource();
+        src.buffer = renderedBuffer;
+        src.connect(dest);
+
+        const stream = offCanvas.captureStream(15);
+        dest.stream.getAudioTracks().forEach((t) => stream.addTrack(t));
+
+        const mimeCandidates = ["video/mp4;codecs=avc1,mp4a.40.2", "video/mp4", "video/webm;codecs=vp8,opus", "video/webm"];
+        const mime = mimeCandidates.find((m) => window.MediaRecorder && MediaRecorder.isTypeSupported(m)) || "video/webm";
+        const ext = mime.includes("mp4") ? ".mp4" : ".webm";
+        const chunks = [];
+        const recorder = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 1500000 });
+        recorder.ondataavailable = (e) => { if (e.data && e.data.size > 0) chunks.push(e.data); };
+
+        const startT = performance.now();
+        const totalMs = renderedBuffer.duration * 1000;
+        let running = true;
+
+        function paintFrame() {
+          if (!running) return;
+          const elapsed = performance.now() - startT;
+          const prog = Math.min(1, elapsed / totalMs);
+          octx.fillStyle = "#090B0E";
+          octx.fillRect(0, 0, offCanvas.width, offCanvas.height);
+          octx.fillStyle = "#F8FAFC";
+          octx.font = "bold 24px sans-serif";
+          octx.fillText(baseName, 40, 80);
+          octx.fillStyle = "rgba(0, 229, 255, 0.25)";
+          octx.fillRect(40, offCanvas.height * 0.45, (offCanvas.width - 80) * prog, 16);
+          octx.strokeStyle = "#00E5FF";
+          octx.strokeRect(40, offCanvas.height * 0.45, offCanvas.width - 80, 16);
+          el.exportProgressBar.style.width = Math.round(70 + prog * 28) + "%";
+          if (running) requestAnimationFrame(paintFrame);
+        }
+
+        await new Promise((resolve) => {
+          recorder.onstop = resolve;
+          recorder.start(250);
+          src.start();
+          paintFrame();
+          src.onended = () => {
+            running = false;
+            setTimeout(() => recorder.stop(), 150);
+          };
+        });
+
+        const blob = new Blob(chunks, { type: mime });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = baseName + "_ducked" + ext;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 1500);
+        el.exportProgressBar.style.width = "100%";
+        el.exportStatusText.textContent = "সম্পন্ন: " + baseName + "_ducked" + ext;
+      }
+
+      async function runExport() {
+        if (!state.voiceBuffer || state.isRendering) return;
         state.isRendering = true;
         el.exportBtn.disabled = true;
         el.exportStatus.classList.add("visible");
-        el.exportProgressBar.style.width = "18%";
-        el.exportStatusText.textContent = "Configuring OfflineAudioContext...";
+        el.exportProgressBar.style.width = "15%";
+        el.exportStatusText.textContent = "অফলাইনে অডিও মিক্স তৈরি হচ্ছে...";
 
         try {
           await new Promise((r) => setTimeout(r, 20));
-          const sampleRate = state.voiceBuffer.sampleRate || 44100;
+          const sr = state.voiceBuffer.sampleRate || 44100;
           const totalDur = Math.max(0.1, state.totalDuration);
-          const totalSamples = Math.ceil(totalDur * sampleRate);
-
+          const totalSamples = Math.ceil(totalDur * sr);
           const OfflineCtx = window.OfflineAudioContext || window.webkitOfflineAudioContext;
-          const offline = new OfflineCtx(2, totalSamples, sampleRate);
+          const offline = new OfflineCtx(2, totalSamples, sr);
 
-          // Voiceover graph
           const vSrc = offline.createBufferSource();
           vSrc.buffer = state.voiceBuffer;
           const vGain = offline.createGain();
@@ -1717,15 +1997,11 @@
           vGain.connect(offline.destination);
           vSrc.start(0);
 
-          // Background music graph
           if (state.musicBuffer && state.musicBuffer.duration > 0) {
             const mSrc = offline.createBufferSource();
             mSrc.buffer = state.musicBuffer;
             mSrc.loop = state.loopMusic;
-            if (state.loopMusic) {
-              mSrc.loopStart = 0;
-              mSrc.loopEnd = state.musicBuffer.duration;
-            }
+            if (state.loopMusic) { mSrc.loopStart = 0; mSrc.loopEnd = state.musicBuffer.duration; }
             const mGain = offline.createGain();
             if (state.gainCurve.length >= 2) {
               mGain.gain.setValueAtTime(state.gainCurve[0], 0);
@@ -1738,103 +2014,129 @@
             mSrc.start(0, 0, state.loopMusic ? totalDur : Math.min(totalDur, state.musicBuffer.duration));
           }
 
-          el.exportProgressBar.style.width = "48%";
-          el.exportStatusText.textContent = "Rendering ducked mix faster than real-time...";
+          el.exportProgressBar.style.width = "45%";
+          el.exportStatusText.textContent = "ডাকিং কার্ভ অনুযায়ী রেন্ডার হচ্ছে...";
+          const rendered = await offline.startRendering();
+
+          const baseName = (state.voiceFileName || "autoduck_mix").replace(/\.[^/.]+$/, "");
+          if (state.exportFormat === "mp4" && !(window.AndroidBridge && typeof window.AndroidBridge.beginExport === "function")) {
+            await exportBrowserMp4Fallback(rendered, baseName);
+            state.isRendering = false;
+            el.exportBtn.disabled = !state.voiceBuffer;
+            return;
+          }
+
+          el.exportProgressBar.style.width = "65%";
+          el.exportStatusText.textContent = state.exportFormat === "mp4"
+            ? "MP4 ভিডিও তৈরি হচ্ছে..."
+            : "১৬-বিট WAV এনকোড হচ্ছে...";
           await new Promise((r) => setTimeout(r, 20));
 
-          const renderedBuffer = await offline.startRendering();
+          const wavBytes = encodeAudioBufferToWav(rendered);
+          const wavName = baseName + "_ducked.wav";
 
-          el.exportProgressBar.style.width = "82%";
-          el.exportStatusText.textContent = "Encoding 16-bit stereo WAV...";
-          await new Promise((r) => setTimeout(r, 20));
-
-          const wavBytes = encodeAudioBufferToWav(renderedBuffer);
-          const baseName = (state.voiceFileName || "autoduck-mix").replace(/\.[^/.]+$/, "");
-          const outName = baseName + "_ducked.wav";
-
-          if (window.AndroidBridge && typeof window.AndroidBridge.beginWavSave === "function") {
-            window.AndroidBridge.beginWavSave(outName);
-            const RAW_CHUNK_SIZE = 196608; // 192 KB (divisible by 3 for clean Base64 chunks)
-            for (let offset = 0; offset < wavBytes.length; offset += RAW_CHUNK_SIZE) {
-              const slice = wavBytes.subarray(offset, Math.min(wavBytes.length, offset + RAW_CHUNK_SIZE));
-              window.AndroidBridge.appendWavChunk(uint8ToBase64(slice));
+          if (window.AndroidBridge && typeof window.AndroidBridge.beginExport === "function") {
+            const peaksCsv = downsampleArray(state.voicePeaks, 100);
+            const curveCsv = downsampleArray(state.gainCurve, 100);
+            window.AndroidBridge.beginExport(
+              wavName,
+              state.exportFormat,
+              state.aspectMode,
+              baseName,
+              Boolean(state.voiceIsVideo),
+              peaksCsv,
+              curveCsv
+            );
+            const CHUNK = 196608;
+            for (let off = 0; off < wavBytes.length; off += CHUNK) {
+              const sl = wavBytes.subarray(off, Math.min(wavBytes.length, off + CHUNK));
+              window.AndroidBridge.appendWavChunk(uint8ToBase64(sl));
             }
             window.AndroidBridge.finishWavSave();
-          } else if (window.AndroidBridge && typeof window.AndroidBridge.saveWavBase64 === "function") {
-            const b64 = uint8ToBase64(wavBytes);
-            window.AndroidBridge.saveWavBase64(outName, b64);
+            if (state.exportFormat === "wav") {
+              el.exportProgressBar.style.width = "100%";
+              el.exportStatusText.textContent = "সেভ সম্পন্ন: Downloads/AutoDuck/" + wavName;
+              state.isRendering = false;
+              el.exportBtn.disabled = !state.voiceBuffer;
+            }
           } else {
             const blob = new Blob([wavBytes], { type: "audio/wav" });
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
-            a.style.display = "none";
             a.href = url;
-            a.download = outName;
+            a.download = wavName;
             document.body.appendChild(a);
             a.click();
-            setTimeout(() => {
-              document.body.removeChild(a);
-              URL.revokeObjectURL(url);
-            }, 1500);
+            setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 1500);
+            el.exportProgressBar.style.width = "100%";
+            el.exportStatusText.textContent = "ডাউনলোড সম্পন্ন: " + wavName;
+            state.isRendering = false;
+            el.exportBtn.disabled = !state.voiceBuffer;
           }
-
-          el.exportProgressBar.style.width = "100%";
-          el.exportStatusText.textContent = "Export complete: " + outName + " (" + (wavBytes.length / (1024 * 1024)).toFixed(2) + " MB)";
         } catch (err) {
           console.error(err);
           el.exportProgressBar.style.width = "0%";
-          el.exportStatusText.textContent = "Export error: " + (err && err.message ? err.message : "Unable to render mix.");
-        } finally {
+          el.exportStatusText.textContent = "ত্রুটি: " + (err && err.message ? err.message : "এক্সপোর্ট করা যায়নি");
           state.isRendering = false;
           el.exportBtn.disabled = !state.voiceBuffer;
         }
       }
 
-      // Bind UI events
-      el.voicePickBtn.addEventListener("click", () => el.voiceInput.click());
-      el.musicPickBtn.addEventListener("click", () => el.musicInput.click());
-      el.voiceInput.addEventListener("change", (e) => handleFileSelection(e.target.files[0], "voice"));
-      el.musicInput.addEventListener("change", (e) => handleFileSelection(e.target.files[0], "music"));
+      // Picker bindings with Android role hint
+      el.voicePickBtn.addEventListener("click", () => {
+        if (window.AndroidBridge && typeof window.AndroidBridge.setPendingPickerRole === "function") {
+          window.AndroidBridge.setPendingPickerRole("voice");
+        }
+        el.voiceInput.click();
+      });
+      el.musicPickBtn.addEventListener("click", () => {
+        if (window.AndroidBridge && typeof window.AndroidBridge.setPendingPickerRole === "function") {
+          window.AndroidBridge.setPendingPickerRole("music");
+        }
+        el.musicInput.click();
+      });
+      el.voiceInput.addEventListener("change", (e) => handleFile(e.target.files[0], "voice"));
+      el.musicInput.addEventListener("change", (e) => handleFile(e.target.files[0], "music"));
       el.voiceClearBtn.addEventListener("click", () => clearTrack("voice"));
       el.musicClearBtn.addEventListener("click", () => clearTrack("music"));
 
       el.loopMusicToggle.addEventListener("change", () => {
         state.loopMusic = el.loopMusicToggle.checked;
         if (state.isPlaying) {
-          const currentPos = state.playOffset + Math.max(0, state.audioCtx.currentTime - state.playStartCtxTime);
-          startPlayback(currentPos);
+          startPlayback(state.playOffset + Math.max(0, state.audioCtx.currentTime - state.playStartCtxTime));
         } else {
           computeDuckCurve();
         }
       });
 
-      el.outroTailSlider.addEventListener("input", () => {
-        state.outroTailSec = parseFloat(el.outroTailSlider.value);
-        el.outroTailVal.textContent = state.outroTailSec.toFixed(1) + " s";
+      el.outroSlider.addEventListener("input", () => {
+        state.outroTailSec = parseFloat(el.outroSlider.value);
+        el.outroVal.textContent = state.outroTailSec.toFixed(1) + " s";
         computeDuckCurve();
       });
 
       el.voiceVolSlider.addEventListener("input", () => {
-        const pct = parseInt(el.voiceVolSlider.value, 10);
-        state.voiceVol = pct / 100;
-        el.voiceVolVal.textContent = pct + "%";
-        drawWaveform();
+        const p = parseInt(el.voiceVolSlider.value, 10);
+        state.voiceVol = p / 100;
+        el.voiceVolVal.textContent = p + "%";
+        updateBeginnerTips();
+        drawTimeline();
         if (state.isPlaying) rescheduleLiveGains();
       });
 
       el.normalVolSlider.addEventListener("input", () => {
-        const pct = parseInt(el.normalVolSlider.value, 10);
-        state.normalVol = pct / 100;
-        el.normalVolVal.textContent = pct + "%";
-        clearPresetHighlight();
+        const p = parseInt(el.normalVolSlider.value, 10);
+        state.normalVol = p / 100;
+        el.normalVolVal.textContent = p + "%";
+        clearPresetActive();
         computeDuckCurve();
       });
 
       el.duckVolSlider.addEventListener("input", () => {
-        const pct = parseInt(el.duckVolSlider.value, 10);
-        state.duckVol = pct / 100;
-        el.duckVolVal.textContent = pct + "%";
-        clearPresetHighlight();
+        const p = parseInt(el.duckVolSlider.value, 10);
+        state.duckVol = p / 100;
+        el.duckVolVal.textContent = p + "%";
+        clearPresetActive();
         computeDuckCurve();
       });
 
@@ -1842,148 +2144,132 @@
         const db = parseInt(el.thresholdSlider.value, 10);
         state.thresholdDb = db;
         el.thresholdVal.textContent = db + " dB";
-        clearPresetHighlight();
+        clearPresetActive();
         computeDuckCurve();
       });
 
       el.holdTimeSlider.addEventListener("input", () => {
-        const sec = parseFloat(el.holdTimeSlider.value);
-        state.holdTimeSec = sec;
-        el.holdTimeVal.textContent = sec.toFixed(2).replace(/0$/, "") + " s";
-        clearPresetHighlight();
+        const s = parseFloat(el.holdTimeSlider.value);
+        state.holdTimeSec = s;
+        el.holdTimeVal.textContent = s.toFixed(2).replace(/0$/, "") + " s";
+        clearPresetActive();
         computeDuckCurve();
       });
 
       el.smoothSlider.addEventListener("input", () => {
-        const lvl = parseFloat(el.smoothSlider.value);
-        state.smoothLevel = lvl;
-        const { attackSec, releaseSec, label } = getAttackRelease(lvl);
+        const l = parseFloat(el.smoothSlider.value);
+        state.smoothLevel = l;
+        const { attackSec, releaseSec, label } = getAttackRelease(l);
         el.smoothVal.textContent = label;
-        el.smoothSub.textContent = "Atk " + Math.round(attackSec * 1000) + "ms / Rel " + Math.round(releaseSec * 1000) + "ms";
-        clearPresetHighlight();
+        el.smoothMs.textContent = "Atk " + Math.round(attackSec * 1000) + "ms / Rel " + Math.round(releaseSec * 1000) + "ms";
+        clearPresetActive();
         computeDuckCurve();
       });
 
-      function clearPresetHighlight() {
-        el.presetChips.forEach((chip) => chip.classList.remove("active"));
+      function clearPresetActive() {
+        el.presetBtns.forEach((b) => b.classList.remove("active"));
       }
 
       const PRESETS = {
-        doc: { normal: 60, duck: 15, threshold: -32, hold: 0.6, smooth: 3 },
-        podcast: { normal: 50, duck: 10, threshold: -35, hold: 0.45, smooth: 2 },
-        cinema: { normal: 75, duck: 22, threshold: -30, hold: 0.9, smooth: 4.5 }
+        doc: { voice: 100, normal: 60, duck: 15, threshold: -32, hold: 0.6, smooth: 3, outro: 2.0 },
+        story: { voice: 105, normal: 65, duck: 18, threshold: -33, hold: 0.75, smooth: 4, outro: 2.5 },
+        podcast: { voice: 105, normal: 50, duck: 10, threshold: -35, hold: 0.45, smooth: 2, outro: 1.5 },
+        cinema: { voice: 100, normal: 75, duck: 22, threshold: -30, hold: 0.9, smooth: 4.5, outro: 3.0 }
       };
 
-      el.presetChips.forEach((chip) => {
+      function applyPreset(key) {
+        const p = PRESETS[key] || PRESETS.doc;
+        clearPresetActive();
+        const match = el.presetBtns.find((b) => b.dataset.preset === key);
+        if (match) match.classList.add("active");
+
+        el.voiceVolSlider.value = p.voice; state.voiceVol = p.voice / 100; el.voiceVolVal.textContent = p.voice + "%";
+        el.normalVolSlider.value = p.normal; state.normalVol = p.normal / 100; el.normalVolVal.textContent = p.normal + "%";
+        el.duckVolSlider.value = p.duck; state.duckVol = p.duck / 100; el.duckVolVal.textContent = p.duck + "%";
+        el.thresholdSlider.value = p.threshold; state.thresholdDb = p.threshold; el.thresholdVal.textContent = p.threshold + " dB";
+        el.holdTimeSlider.value = p.hold; state.holdTimeSec = p.hold; el.holdTimeVal.textContent = p.hold.toFixed(2).replace(/0$/, "") + " s";
+        el.smoothSlider.value = p.smooth; state.smoothLevel = p.smooth;
+        const { attackSec, releaseSec, label } = getAttackRelease(p.smooth);
+        el.smoothVal.textContent = label;
+        el.smoothMs.textContent = "Atk " + Math.round(attackSec * 1000) + "ms / Rel " + Math.round(releaseSec * 1000) + "ms";
+        el.outroSlider.value = p.outro; state.outroTailSec = p.outro; el.outroVal.textContent = p.outro.toFixed(1) + " s";
+        computeDuckCurve();
+      }
+
+      el.presetBtns.forEach((b) => b.addEventListener("click", () => applyPreset(b.dataset.preset)));
+      el.resetBestBtn.addEventListener("click", () => applyPreset("doc"));
+
+      el.fmtMp4Btn.addEventListener("click", () => {
+        state.exportFormat = "mp4";
+        el.fmtMp4Btn.classList.add("active");
+        el.fmtWavBtn.classList.remove("active");
+        updateUI();
+      });
+
+      el.fmtWavBtn.addEventListener("click", () => {
+        state.exportFormat = "wav";
+        el.fmtWavBtn.classList.add("active");
+        el.fmtMp4Btn.classList.remove("active");
+        updateUI();
+      });
+
+      el.aspectChips.forEach((chip) => {
         chip.addEventListener("click", () => {
-          const p = PRESETS[chip.dataset.preset];
-          if (!p) return;
-          clearPresetHighlight();
-          chip.classList.add("active");
-
-          el.normalVolSlider.value = p.normal;
-          state.normalVol = p.normal / 100;
-          el.normalVolVal.textContent = p.normal + "%";
-
-          el.duckVolSlider.value = p.duck;
-          state.duckVol = p.duck / 100;
-          el.duckVolVal.textContent = p.duck + "%";
-
-          el.thresholdSlider.value = p.threshold;
-          state.thresholdDb = p.threshold;
-          el.thresholdVal.textContent = p.threshold + " dB";
-
-          el.holdTimeSlider.value = p.hold;
-          state.holdTimeSec = p.hold;
-          el.holdTimeVal.textContent = p.hold.toFixed(2).replace(/0$/, "") + " s";
-
-          el.smoothSlider.value = p.smooth;
-          state.smoothLevel = p.smooth;
-          const { attackSec, releaseSec, label } = getAttackRelease(p.smooth);
-          el.smoothVal.textContent = label;
-          el.smoothSub.textContent = "Atk " + Math.round(attackSec * 1000) + "ms / Rel " + Math.round(releaseSec * 1000) + "ms";
-
-          computeDuckCurve();
+          state.aspectMode = chip.dataset.aspect;
+          el.aspectChips.forEach((c) => c.classList.toggle("active", c === chip));
         });
       });
 
       el.playPauseBtn.addEventListener("click", async () => {
         await ensureAudioResumed();
-        if (state.isPlaying) {
-          pausePlayback();
-        } else {
-          if (state.playOffset >= state.totalDuration - 0.05) {
-            state.playOffset = 0;
-          }
+        if (state.isPlaying) pausePlayback();
+        else {
+          if (state.playOffset >= state.totalDuration - 0.05) state.playOffset = 0;
           startPlayback(state.playOffset);
         }
       });
 
       el.stopBtn.addEventListener("click", () => stopPlayback(true));
+      el.exportBtn.addEventListener("click", runExport);
 
-      el.seekBar.addEventListener("input", () => {
-        state.isSeeking = true;
-        const target = (parseInt(el.seekBar.value, 10) / 1000) * state.totalDuration;
-        el.timeDisplay.textContent = formatTime(target) + " / " + formatTime(state.totalDuration);
-        drawWaveform(target);
-      });
-
-      el.seekBar.addEventListener("change", async () => {
-        const target = (parseInt(el.seekBar.value, 10) / 1000) * state.totalDuration;
-        state.isSeeking = false;
-        state.playOffset = target;
-        if (state.isPlaying) {
-          await startPlayback(target);
-        } else {
-          drawWaveform(target);
-        }
-      });
-
-      // Touch / click scrubbing on waveform canvas
-      let canvasDragging = false;
-      function seekFromPointer(clientX) {
+      let dragging = false;
+      function scrubTimeline(clientX) {
         if (state.totalDuration <= 0) return;
         const rect = el.canvas.getBoundingClientRect();
         const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
         const target = ratio * state.totalDuration;
         state.playOffset = target;
-        el.seekBar.value = Math.round(ratio * 1000);
         el.timeDisplay.textContent = formatTime(target) + " / " + formatTime(state.totalDuration);
-        drawWaveform(target);
+        if (state.voiceIsVideo && el.previewVideo.src) {
+          try { el.previewVideo.currentTime = Math.min(target, el.previewVideo.duration || target); } catch (_) {}
+        }
+        updateLiveMeters(target);
+        drawTimeline(target);
         return target;
       }
 
       el.canvas.addEventListener("pointerdown", (e) => {
         if (state.totalDuration <= 0) return;
-        canvasDragging = true;
+        dragging = true;
         el.canvas.setPointerCapture(e.pointerId);
-        seekFromPointer(e.clientX);
+        scrubTimeline(e.clientX);
       });
-
-      el.canvas.addEventListener("pointermove", (e) => {
-        if (!canvasDragging) return;
-        seekFromPointer(e.clientX);
-      });
-
+      el.canvas.addEventListener("pointermove", (e) => { if (dragging) scrubTimeline(e.clientX); });
       el.canvas.addEventListener("pointerup", (e) => {
-        if (!canvasDragging) return;
-        canvasDragging = false;
-        const target = seekFromPointer(e.clientX);
-        if (state.isPlaying && typeof target === "number") {
-          startPlayback(target);
-        }
+        if (!dragging) return;
+        dragging = false;
+        const target = scrubTimeline(e.clientX);
+        if (state.isPlaying && typeof target === "number") startPlayback(target);
       });
 
-      el.exportBtn.addEventListener("click", exportMixedWav);
-
-      // Resize observer for sharp canvas rendering
       if (typeof ResizeObserver !== "undefined") {
-        new ResizeObserver(() => drawWaveform()).observe(el.canvas);
+        new ResizeObserver(() => drawTimeline()).observe(el.canvas);
       } else {
-        window.addEventListener("resize", () => drawWaveform());
+        window.addEventListener("resize", () => drawTimeline());
       }
 
-      updateTrackUI();
+      updateBeginnerTips();
+      updateUI();
     })();
   </script>
 </body>

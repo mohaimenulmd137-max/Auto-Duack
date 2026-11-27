@@ -1,7 +1,8 @@
 <resources>
     <string name="app_name">AutoDuck Studio</string>
     <string name="export_saved_message">Saved WAV mix to Downloads/AutoDuck: %1$s</string>
-    <string name="export_share_chooser">Share Mixed WAV</string>
-    <string name="file_pick_failed">Unable to open selected audio file.</string>
+    <string name="export_mp4_saved_message">Saved MP4 video to Movies/AutoDuck: %1$s</string>
+    <string name="export_share_chooser">Share Mixed File</string>
+    <string name="file_pick_failed">Unable to open selected media file.</string>
     <string name="share_action">Share</string>
 </resources>

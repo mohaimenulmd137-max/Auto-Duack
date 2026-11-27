@@ -50,19 +50,28 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.json.JSONObject
 
 class MainActivity : ComponentActivity() {
 
   private var pendingFileCallback: ValueCallback<Array<Uri>>? = null
-  private var pendingLegacyExportFile: File? = null
-  private var onLegacySavedCallback: ((String, Uri) -> Unit)? = null
+  private var pendingPickerRole: String = "voice"
+  private var sourceVideoUri: Uri? = null
 
-  private val openAudioLauncher =
+  private var pendingLegacyExportFile: File? = null
+  private var pendingLegacyMimeType: String = "audio/wav"
+  private var onLegacySavedCallback: ((String, Uri, String) -> Unit)? = null
+
+  private val openMediaLauncher =
     registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
       val callback = pendingFileCallback
       pendingFileCallback = null
       if (callback != null) {
         if (uri != null) {
+          if (pendingPickerRole == "voice") {
+            val mime = contentResolver.getType(uri) ?: ""
+            sourceVideoUri = if (mime.startsWith("video/")) uri else null
+          }
           callback.onReceiveValue(arrayOf(uri))
         } else {
           callback.onReceiveValue(null)
@@ -72,23 +81,33 @@ class MainActivity : ComponentActivity() {
 
   private val createWavLauncher =
     registerForActivityResult(ActivityResultContracts.CreateDocument("audio/wav")) { uri: Uri? ->
-      val sourceFile = pendingLegacyExportFile
-      pendingLegacyExportFile = null
-      if (uri != null && sourceFile != null && sourceFile.exists()) {
-        val fileName = sourceFile.name
-        CoroutineScope(Dispatchers.IO).launch {
-          runCatching {
-            contentResolver.openOutputStream(uri)?.use { out ->
-              sourceFile.inputStream().use { input -> input.copyTo(out) }
-            }
-          }.onSuccess {
-            withContext(Dispatchers.Main) {
-              onLegacySavedCallback?.invoke(fileName, uri)
-            }
+      completeLegacyCreateDocument(uri)
+    }
+
+  private val createMp4Launcher =
+    registerForActivityResult(ActivityResultContracts.CreateDocument("video/mp4")) { uri: Uri? ->
+      completeLegacyCreateDocument(uri)
+    }
+
+  private fun completeLegacyCreateDocument(uri: Uri?) {
+    val sourceFile = pendingLegacyExportFile
+    val mimeType = pendingLegacyMimeType
+    pendingLegacyExportFile = null
+    if (uri != null && sourceFile != null && sourceFile.exists()) {
+      val fileName = sourceFile.name
+      CoroutineScope(Dispatchers.IO).launch {
+        runCatching {
+          contentResolver.openOutputStream(uri)?.use { out ->
+            sourceFile.inputStream().use { input -> input.copyTo(out) }
+          }
+        }.onSuccess {
+          withContext(Dispatchers.Main) {
+            onLegacySavedCallback?.invoke(fileName, uri, mimeType)
           }
         }
       }
     }
+  }
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -110,25 +129,34 @@ class MainActivity : ComponentActivity() {
         ) { innerPadding ->
           AutoDuckWebViewScreen(
             modifier = Modifier.fillMaxSize().padding(innerPadding),
+            onSetPickerRole = { role -> pendingPickerRole = role },
+            onClearSourceVideo = { sourceVideoUri = null },
             onShowFileChooser = { callback ->
               pendingFileCallback?.onReceiveValue(null)
               pendingFileCallback = callback
-              openAudioLauncher.launch(arrayOf("audio/*", "application/ogg"))
+              if (pendingPickerRole == "voice") {
+                openMediaLauncher.launch(arrayOf("audio/*", "video/mp4", "video/*", "application/ogg"))
+              } else {
+                openMediaLauncher.launch(arrayOf("audio/*", "application/ogg"))
+              }
             },
-            onExportReady = { fileName, tempFile ->
-              handleWavExport(
-                fileName = fileName,
-                tempFile = tempFile,
-                onSaved = { savedName, shareUri ->
+            onExportRequest = { request, webView ->
+              handleMediaExport(
+                request = request,
+                webView = webView,
+                onSaved = { savedName, shareUri, mimeType ->
                   scope.launch {
+                    val msgRes =
+                      if (mimeType == "video/mp4") R.string.export_mp4_saved_message
+                      else R.string.export_saved_message
                     val result =
                       snackbarHostState.showSnackbar(
-                        message = getString(R.string.export_saved_message, savedName),
+                        message = getString(msgRes, savedName),
                         actionLabel = getString(R.string.share_action),
                         duration = SnackbarDuration.Long,
                       )
                     if (result == SnackbarResult.ActionPerformed) {
-                      shareAudioUri(shareUri)
+                      shareMediaUri(shareUri, mimeType)
                     }
                   }
                 },
@@ -140,55 +168,142 @@ class MainActivity : ComponentActivity() {
     }
   }
 
-  private fun handleWavExport(
-    fileName: String,
-    tempFile: File,
+  private fun handleMediaExport(
+    request: ExportRequest,
+    webView: WebView,
+    onSaved: (String, Uri, String) -> Unit,
+  ) {
+    fun notifyWebProgress(pct: Int, msg: String, done: Boolean = false, error: String? = null) {
+      val safeMsg = JSONObject.quote(msg)
+      val safeErr = if (error != null) JSONObject.quote(error) else "null"
+      webView.post {
+        webView.evaluateJavascript(
+          "window.onAndroidExportProgress && window.onAndroidExportProgress($pct, $safeMsg, $done, $safeErr);",
+          null,
+        )
+      }
+    }
+
+    if (request.format == "mp4") {
+      CoroutineScope(Dispatchers.IO).launch {
+        try {
+          val exportDir = File(cacheDir, "exports").apply { mkdirs() }
+          val mp4Name = request.fileName.replace(Regex("\\.wav$", RegexOption.IGNORE_CASE), "") + ".mp4"
+          val outMp4 = File(exportDir, mp4Name)
+          if (outMp4.exists()) outMp4.delete()
+
+          Mp4Exporter.exportToMp4(
+            context = this@MainActivity,
+            wavFile = request.wavFile,
+            outputMp4 = outMp4,
+            sourceVideoUri = if (request.useSourceVideo) sourceVideoUri else null,
+            titleText = request.titleText,
+            aspectMode = request.aspectMode,
+            waveformPeaks = request.peaks,
+            gainCurve = request.gainCurve,
+            onProgress = { pct, status -> notifyWebProgress(pct, status) },
+          )
+
+          saveFileToPublicStorage(
+            file = outMp4,
+            displayName = mp4Name,
+            mimeType = "video/mp4",
+            isVideo = true,
+            onSaved = { savedName, shareUri ->
+              notifyWebProgress(100, "MP4 Saved: $savedName", done = true)
+              onSaved(savedName, shareUri, "video/mp4")
+            },
+          )
+        } catch (t: Throwable) {
+          notifyWebProgress(0, "MP4 Export Failed", done = true, error = t.message ?: "Encoding error")
+        }
+      }
+    } else {
+      saveFileToPublicStorage(
+        file = request.wavFile,
+        displayName = request.fileName,
+        mimeType = "audio/wav",
+        isVideo = false,
+        onSaved = { savedName, shareUri ->
+          notifyWebProgress(100, "WAV Saved: $savedName", done = true)
+          onSaved(savedName, shareUri, "audio/wav")
+        },
+      )
+    }
+  }
+
+  private fun saveFileToPublicStorage(
+    file: File,
+    displayName: String,
+    mimeType: String,
+    isVideo: Boolean,
     onSaved: (String, Uri) -> Unit,
   ) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
       CoroutineScope(Dispatchers.IO).launch {
         val values =
           ContentValues().apply {
-            put(MediaStore.Downloads.DISPLAY_NAME, fileName)
-            put(MediaStore.Downloads.MIME_TYPE, "audio/wav")
-            put(
-              MediaStore.Downloads.RELATIVE_PATH,
-              Environment.DIRECTORY_DOWNLOADS + File.separator + "AutoDuck",
-            )
-            put(MediaStore.Downloads.IS_PENDING, 1)
+            if (isVideo) {
+              put(MediaStore.Video.Media.DISPLAY_NAME, displayName)
+              put(MediaStore.Video.Media.MIME_TYPE, mimeType)
+              put(
+                MediaStore.Video.Media.RELATIVE_PATH,
+                Environment.DIRECTORY_MOVIES + File.separator + "AutoDuck",
+              )
+              put(MediaStore.Video.Media.IS_PENDING, 1)
+            } else {
+              put(MediaStore.Downloads.DISPLAY_NAME, displayName)
+              put(MediaStore.Downloads.MIME_TYPE, mimeType)
+              put(
+                MediaStore.Downloads.RELATIVE_PATH,
+                Environment.DIRECTORY_DOWNLOADS + File.separator + "AutoDuck",
+              )
+              put(MediaStore.Downloads.IS_PENDING, 1)
+            }
           }
 
+        val collectionUri =
+          if (isVideo) MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+          else MediaStore.Downloads.EXTERNAL_CONTENT_URI
+
         val resolver = contentResolver
-        val itemUri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values)
+        val itemUri = resolver.insert(collectionUri, values)
         if (itemUri != null) {
           runCatching {
             resolver.openOutputStream(itemUri)?.use { out ->
-              tempFile.inputStream().use { input -> input.copyTo(out) }
+              file.inputStream().use { input -> input.copyTo(out) }
             }
             values.clear()
-            values.put(MediaStore.Downloads.IS_PENDING, 0)
+            values.put(MediaStore.MediaColumns.IS_PENDING, 0)
             resolver.update(itemUri, values, null, null)
           }
           val shareUri =
             FileProvider.getUriForFile(
               this@MainActivity,
               "${packageName}.fileprovider",
-              tempFile,
+              file,
             )
-          withContext(Dispatchers.Main) { onSaved(fileName, shareUri) }
+          withContext(Dispatchers.Main) { onSaved(displayName, shareUri) }
         }
       }
     } else {
-      pendingLegacyExportFile = tempFile
-      onLegacySavedCallback = onSaved
-      createWavLauncher.launch(fileName)
+      CoroutineScope(Dispatchers.Main).launch {
+        pendingLegacyExportFile = file
+        pendingLegacyMimeType = mimeType
+        onLegacySavedCallback = { name, uri, _ -> onSaved(name, uri) }
+        if (isVideo) {
+          createMp4Launcher.launch(displayName)
+        } else {
+          createWavLauncher.launch(displayName)
+        }
+      }
     }
   }
 
-  private fun shareAudioUri(uri: Uri) {
+  private fun shareMediaUri(uri: Uri, mimeType: String) {
     val shareIntent =
       Intent(Intent.ACTION_SEND).apply {
-        type = "audio/wav"
+        type = mimeType
         putExtra(Intent.EXTRA_STREAM, uri)
         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
       }
@@ -202,12 +317,25 @@ class MainActivity : ComponentActivity() {
   }
 }
 
+data class ExportRequest(
+  val wavFile: File,
+  val fileName: String,
+  val format: String,
+  val aspectMode: String,
+  val titleText: String,
+  val useSourceVideo: Boolean,
+  val peaks: FloatArray,
+  val gainCurve: FloatArray,
+)
+
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun AutoDuckWebViewScreen(
   modifier: Modifier = Modifier,
+  onSetPickerRole: (String) -> Unit,
+  onClearSourceVideo: () -> Unit,
   onShowFileChooser: (ValueCallback<Array<Uri>>) -> Unit,
-  onExportReady: (String, File) -> Unit,
+  onExportRequest: (ExportRequest, WebView) -> Unit,
 ) {
   val context = androidx.compose.ui.platform.LocalContext.current
   val webView = remember {
@@ -243,7 +371,15 @@ fun AutoDuckWebViewScreen(
           }
         }
 
-      addJavascriptInterface(AndroidAudioBridge(context, onExportReady), "AndroidBridge")
+      addJavascriptInterface(
+        AndroidAudioBridge(
+          context = context,
+          onSetPickerRole = onSetPickerRole,
+          onClearSourceVideo = onClearSourceVideo,
+          onExportReady = { req -> onExportRequest(req, this) },
+        ),
+        "AndroidBridge",
+      )
       loadUrl("file:///android_asset/index.html")
     }
   }
@@ -265,21 +401,58 @@ fun AutoDuckWebViewScreen(
 
 private class AndroidAudioBridge(
   private val context: Context,
-  private val onExportReady: (String, File) -> Unit,
+  private val onSetPickerRole: (String) -> Unit,
+  private val onClearSourceVideo: () -> Unit,
+  private val onExportReady: (ExportRequest) -> Unit,
 ) {
   private var currentFile: File? = null
   private var currentFileName: String = "autoduck_mix.wav"
+  private var currentFormat: String = "wav"
+  private var currentAspect: String = "16:9"
+  private var currentTitle: String = "AutoDuck Studio"
+  private var currentUseSourceVideo: Boolean = false
+  private var currentPeaks: FloatArray = FloatArray(0)
+  private var currentCurve: FloatArray = FloatArray(0)
   private var currentOutput: FileOutputStream? = null
 
   @JavascriptInterface
-  fun beginWavSave(fileName: String) {
+  fun setPendingPickerRole(role: String) {
+    onSetPickerRole(role)
+  }
+
+  @JavascriptInterface
+  fun clearSourceVideo() {
+    onClearSourceVideo()
+  }
+
+  @JavascriptInterface
+  fun beginExport(
+    fileName: String,
+    format: String,
+    aspectMode: String,
+    titleText: String,
+    useSourceVideo: Boolean,
+    peaksCsv: String,
+    curveCsv: String,
+  ) {
     closeStreamQuietly()
-    val safeName = sanitizeFileName(fileName)
+    val safeName = sanitizeWavName(fileName)
     val exportDir = File(context.cacheDir, "exports").apply { mkdirs() }
     val outFile = File(exportDir, safeName)
     currentFile = outFile
     currentFileName = safeName
+    currentFormat = if (format.equals("mp4", ignoreCase = true)) "mp4" else "wav"
+    currentAspect = aspectMode
+    currentTitle = titleText.ifBlank { "AutoDuck Studio" }
+    currentUseSourceVideo = useSourceVideo
+    currentPeaks = parseFloatCsv(peaksCsv)
+    currentCurve = parseFloatCsv(curveCsv)
     currentOutput = FileOutputStream(outFile, false)
+  }
+
+  @JavascriptInterface
+  fun beginWavSave(fileName: String) {
+    beginExport(fileName, "wav", "16:9", "AutoDuck Studio", false, "", "")
   }
 
   @JavascriptInterface
@@ -294,7 +467,18 @@ private class AndroidAudioBridge(
     val name = currentFileName
     closeStreamQuietly()
     if (file != null && file.exists()) {
-      onExportReady(name, file)
+      onExportReady(
+        ExportRequest(
+          wavFile = file,
+          fileName = name,
+          format = currentFormat,
+          aspectMode = currentAspect,
+          titleText = currentTitle,
+          useSourceVideo = currentUseSourceVideo,
+          peaks = currentPeaks,
+          gainCurve = currentCurve,
+        ),
+      )
     }
   }
 
@@ -305,6 +489,16 @@ private class AndroidAudioBridge(
     finishWavSave()
   }
 
+  private fun parseFloatCsv(csv: String): FloatArray {
+    if (csv.isBlank()) return FloatArray(0)
+    val parts = csv.split(',')
+    val arr = FloatArray(parts.size)
+    for (i in parts.indices) {
+      arr[i] = parts[i].toFloatOrNull() ?: 0f
+    }
+    return arr
+  }
+
   private fun closeStreamQuietly() {
     runCatching {
       currentOutput?.flush()
@@ -313,7 +507,7 @@ private class AndroidAudioBridge(
     currentOutput = null
   }
 
-  private fun sanitizeFileName(raw: String): String {
+  private fun sanitizeWavName(raw: String): String {
     val base = raw.substringAfterLast('/').substringAfterLast('\\').ifBlank { "autoduck_mix.wav" }
     return if (base.endsWith(".wav", ignoreCase = true)) base else "$base.wav"
   }
