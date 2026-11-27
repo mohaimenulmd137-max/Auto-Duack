@@ -1,0 +1,6 @@
+{
+  "name": "AutoDuck Studio",
+  "description": "Documentary and storytelling auto audio ducking studio with real-time waveform preview and offline WAV export.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

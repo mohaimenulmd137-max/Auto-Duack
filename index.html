@@ -1,0 +1,1990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0B0F14" />
+  <title>AutoDuck Studio — Documentary Voiceover Mixer</title>
+  <style>
+    :root {
+      --bg-base: #0B0F14;
+      --bg-surface: #121821;
+      --bg-elevated: #1A222E;
+      --bg-input: #0F141C;
+      --border-subtle: rgba(148, 163, 184, 0.14);
+      --border-active: rgba(34, 211, 238, 0.45);
+      --text-primary: #F1F5F9;
+      --text-secondary: #94A3B8;
+      --text-muted: #64748B;
+      --cyan: #22D3EE;
+      --cyan-soft: rgba(34, 211, 238, 0.14);
+      --amber: #F59E0B;
+      --amber-soft: rgba(245, 158, 11, 0.14);
+      --emerald: #10B981;
+      --emerald-soft: rgba(16, 185, 129, 0.16);
+      --rose: #F43F5E;
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+      --shadow-card: 0 8px 28px rgba(0, 0, 0, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-base);
+      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Helvetica, Arial, sans-serif;
+      font-size: 15px;
+      line-height: 1.45;
+      overflow-x: hidden;
+    }
+
+    body {
+      padding: calc(14px + env(safe-area-inset-top)) 14px calc(28px + env(safe-area-inset-bottom)) 14px;
+      background-image:
+        radial-gradient(circle at 12% 0%, rgba(34, 211, 238, 0.08), transparent 42%),
+        radial-gradient(circle at 88% 10%, rgba(245, 158, 11, 0.06), transparent 40%);
+      min-height: 100vh;
+    }
+
+    .app-shell {
+      max-width: 820px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* Header */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 4px 2px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-mark {
+      width: 38px;
+      height: 38px;
+      border-radius: 11px;
+      background: linear-gradient(135deg, rgba(34, 211, 238, 0.22), rgba(16, 185, 129, 0.18));
+      border: 1px solid rgba(34, 211, 238, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .brand-mark svg {
+      width: 22px;
+      height: 22px;
+      stroke: var(--cyan);
+    }
+
+    .brand-title {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin: 0;
+    }
+
+    .brand-sub {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+
+    .badge-local {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--cyan);
+      white-space: nowrap;
+    }
+
+    /* Card */
+    .card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      box-shadow: var(--shadow-card);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-secondary);
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .dot-cyan { background: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
+    .dot-amber { background: var(--amber); box-shadow: 0 0 8px var(--amber); }
+    .dot-emerald { background: var(--emerald); box-shadow: 0 0 8px var(--emerald); }
+
+    /* Track Upload Grid */
+    .tracks-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    @media (min-width: 680px) {
+      .tracks-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .track-box {
+      position: relative;
+      background: var(--bg-input);
+      border: 1.5px dashed rgba(148, 163, 184, 0.28);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      transition: border-color 0.2s ease, background-color 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .track-box.loaded-voice {
+      border-style: solid;
+      border-color: rgba(34, 211, 238, 0.45);
+      background: linear-gradient(180deg, rgba(34, 211, 238, 0.07), rgba(15, 20, 28, 0.95));
+    }
+
+    .track-box.loaded-music {
+      border-style: solid;
+      border-color: rgba(245, 158, 11, 0.45);
+      background: linear-gradient(180deg, rgba(245, 158, 11, 0.07), rgba(15, 20, 28, 0.95));
+    }
+
+    .track-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .track-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .track-hint {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .track-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 8px 10px;
+      min-height: 40px;
+    }
+
+    .track-filename {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1;
+    }
+
+    .track-filename.placeholder {
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    .track-duration {
+      font-variant-numeric: tabular-nums;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: var(--bg-elevated);
+      color: var(--text-secondary);
+      flex-shrink: 0;
+    }
+
+    .track-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .file-input-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .btn {
+      appearance: none;
+      border: none;
+      border-radius: var(--radius-md);
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 14px;
+      min-height: 46px;
+      padding: 10px 16px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 0.1s ease, opacity 0.2s ease, background-color 0.2s ease;
+      user-select: none;
+    }
+
+    .btn:active:not(:disabled) {
+      transform: scale(0.98);
+    }
+
+    .btn:disabled {
+      opacity: 0.42;
+      cursor: not-allowed;
+    }
+
+    .btn-pick {
+      flex: 1;
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .btn-pick-voice {
+      border-color: rgba(34, 211, 238, 0.32);
+    }
+
+    .btn-pick-music {
+      border-color: rgba(245, 158, 11, 0.32);
+    }
+
+    .btn-clear {
+      min-width: 46px;
+      padding: 0 12px;
+      background: rgba(244, 63, 94, 0.12);
+      color: #FDA4AF;
+      border: 1px solid rgba(244, 63, 94, 0.25);
+    }
+
+    /* Length & Loop Options */
+    .sync-row {
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .toggle-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 44px;
+      cursor: pointer;
+      padding: 6px 10px;
+      border-radius: var(--radius-md);
+      background: var(--bg-input);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .toggle-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .toggle-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .toggle-desc {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .switch {
+      position: relative;
+      width: 50px;
+      height: 28px;
+      flex-shrink: 0;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .switch-slider {
+      position: absolute;
+      inset: 0;
+      background: #2A3544;
+      border-radius: 999px;
+      transition: background-color 0.2s ease;
+    }
+
+    .switch-slider::before {
+      content: "";
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      left: 3px;
+      top: 3px;
+      background: #FFFFFF;
+      border-radius: 50%;
+      transition: transform 0.2s ease;
+    }
+
+    .switch input:checked + .switch-slider {
+      background: var(--cyan);
+    }
+
+    .switch input:checked + .switch-slider::before {
+      transform: translateX(22px);
+      background: #082F49;
+    }
+
+    /* Waveform Canvas */
+    .canvas-wrap {
+      position: relative;
+      width: 100%;
+      height: 176px;
+      background: #080C11;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+      overflow: hidden;
+      touch-action: none;
+    }
+
+    #waveformCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: pointer;
+    }
+
+    .canvas-empty {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      pointer-events: none;
+      color: var(--text-muted);
+      font-size: 13px;
+      text-align: center;
+      padding: 16px;
+    }
+
+    .legend-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .legend-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .swatch {
+      width: 12px;
+      height: 4px;
+      border-radius: 2px;
+      display: inline-block;
+    }
+
+    /* Transport Controls */
+    .transport-bar {
+      margin-top: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .seek-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .time-readout {
+      font-variant-numeric: tabular-nums;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      min-width: 96px;
+      text-align: right;
+    }
+
+    .transport-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .btn-play {
+      background: linear-gradient(135deg, #06B6D4, #22D3EE);
+      color: #04202C;
+      font-weight: 700;
+      min-height: 50px;
+    }
+
+    .btn-stop {
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      border: 1px solid var(--border-subtle);
+      min-height: 50px;
+    }
+
+    /* Sliders */
+    .controls-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    @media (min-width: 680px) {
+      .controls-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .control-item {
+      background: var(--bg-input);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .control-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .control-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .control-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .control-value {
+      font-variant-numeric: tabular-nums;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--cyan);
+      background: var(--cyan-soft);
+      padding: 3px 9px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .control-value.amber {
+      color: var(--amber);
+      background: var(--amber-soft);
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 30px;
+      background: transparent;
+      cursor: pointer;
+      margin: 0;
+    }
+
+    input[type="range"]::-webkit-slider-runnable-track {
+      height: 6px;
+      border-radius: 999px;
+      background: #243040;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--cyan);
+      border: 2px solid #0B0F14;
+      margin-top: -8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    }
+
+    input[type="range"].amber-slider::-webkit-slider-thumb {
+      background: var(--amber);
+    }
+
+    input[type="range"]::-moz-range-track {
+      height: 6px;
+      border-radius: 999px;
+      background: #243040;
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--cyan);
+      border: 2px solid #0B0F14;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    }
+
+    input[type="range"].amber-slider::-moz-range-thumb {
+      background: var(--amber);
+    }
+
+    /* Export Card */
+    .export-card {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(18, 24, 33, 0.98));
+      border-color: rgba(16, 185, 129, 0.28);
+    }
+
+    .btn-export {
+      width: 100%;
+      min-height: 54px;
+      font-size: 15px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #059669, #10B981);
+      color: #032219;
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.25);
+    }
+
+    .status-banner {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-input);
+      border: 1px solid var(--border-subtle);
+      font-size: 13px;
+      color: var(--text-secondary);
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .status-banner.visible {
+      display: flex;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 6px;
+      border-radius: 999px;
+      background: #232F3E;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--cyan), var(--emerald));
+      transition: width 0.2s ease;
+    }
+
+    .presets-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .preset-chip {
+      appearance: none;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-elevated);
+      color: var(--text-secondary);
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      min-height: 34px;
+      cursor: pointer;
+    }
+
+    .preset-chip.active {
+      border-color: var(--cyan);
+      color: var(--cyan);
+      background: var(--cyan-soft);
+    }
+  </style>
+</head>
+<body>
+  <main class="app-shell">
+    <!-- Header -->
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
+            <path d="M19 10v1a7 7 0 0 1-14 0v-1" />
+            <path d="M3 15c3 0 4 4 9 4s6-4 9-4" />
+          </svg>
+        </div>
+        <div>
+          <h1 class="brand-title">AutoDuck Studio</h1>
+          <p class="brand-sub">Documentary Voiceover &amp; Music Ducking</p>
+        </div>
+      </div>
+      <span class="badge-local">100% Local Audio</span>
+    </header>
+
+    <!-- Track Inputs & Sync -->
+    <section class="card" aria-label="Audio Tracks">
+      <div class="section-header">
+        <h2 class="section-title"><span class="dot dot-cyan"></span> Audio Tracks</h2>
+        <span id="outputLengthBadge" class="track-duration">Mix: 00:00</span>
+      </div>
+
+      <div class="tracks-grid">
+        <!-- Track 1: Voiceover -->
+        <div class="track-box" id="voiceBox">
+          <div class="track-top">
+            <div>
+              <div class="track-label">Track 1: Voiceover Audio</div>
+              <div class="track-hint">Primary speech (.mp3, .wav, .m4a, .ogg)</div>
+            </div>
+          </div>
+          <div class="track-meta">
+            <span class="track-filename placeholder" id="voiceName">No voiceover loaded</span>
+            <span class="track-duration" id="voiceDuration">00:00</span>
+          </div>
+          <div class="track-actions">
+            <input type="file" id="voiceInput" class="file-input-hidden" accept=".mp3,.wav,.m4a,.ogg,audio/*" />
+            <button type="button" class="btn btn-pick btn-pick-voice" id="voicePickBtn">
+              Select Voiceover
+            </button>
+            <button type="button" class="btn btn-clear" id="voiceClearBtn" title="Clear Voiceover" aria-label="Clear Voiceover" disabled>
+              ✕
+            </button>
+          </div>
+        </div>
+
+        <!-- Track 2: Background Music -->
+        <div class="track-box" id="musicBox">
+          <div class="track-top">
+            <div>
+              <div class="track-label">Track 2: Background Music</div>
+              <div class="track-hint">Ambient score (.mp3, .wav, .m4a, .ogg)</div>
+            </div>
+          </div>
+          <div class="track-meta">
+            <span class="track-filename placeholder" id="musicName">No music loaded</span>
+            <span class="track-duration" id="musicDuration">00:00</span>
+          </div>
+          <div class="track-actions">
+            <input type="file" id="musicInput" class="file-input-hidden" accept=".mp3,.wav,.m4a,.ogg,audio/*" />
+            <button type="button" class="btn btn-pick btn-pick-music" id="musicPickBtn">
+              Select Music
+            </button>
+            <button type="button" class="btn btn-clear" id="musicClearBtn" title="Clear Music" aria-label="Clear Music" disabled>
+              ✕
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Smart Length Handling -->
+      <div class="sync-row">
+        <label class="toggle-label" for="loopMusicToggle">
+          <div class="toggle-text">
+            <span class="toggle-title">Loop Background Music if shorter than Voiceover</span>
+            <span class="toggle-desc">Repeats ambient track seamlessly to match full story length</span>
+          </div>
+          <div class="switch">
+            <input type="checkbox" id="loopMusicToggle" checked />
+            <span class="switch-slider"></span>
+          </div>
+        </label>
+
+        <div class="control-item">
+          <div class="control-head">
+            <div>
+              <div class="control-name">Outro Tail Fade-Out</div>
+              <div class="control-sub">Smooth music fade-out after voiceover finishes</div>
+            </div>
+            <span class="control-value amber" id="outroTailVal">2.0 s</span>
+          </div>
+          <input type="range" id="outroTailSlider" class="amber-slider" min="0" max="5" step="0.5" value="2.0" />
+        </div>
+      </div>
+    </section>
+
+    <!-- Visual Feedback & Live Preview -->
+    <section class="card" aria-label="Waveform and Preview">
+      <div class="section-header">
+        <h2 class="section-title"><span class="dot dot-amber"></span> Waveform &amp; Ducking Curve</h2>
+        <span class="control-sub" id="duckStatePill">Ready</span>
+      </div>
+
+      <div class="canvas-wrap">
+        <canvas id="waveformCanvas"></canvas>
+        <div class="canvas-empty" id="canvasEmptyState">
+          <strong>Load Voiceover &amp; Background Music</strong>
+          <span>The voiceover waveform and automatic music ducking curve will render here.</span>
+        </div>
+      </div>
+
+      <div class="legend-row">
+        <div class="legend-items">
+          <span class="legend-item"><span class="swatch" style="background: var(--cyan);"></span> Voiceover</span>
+          <span class="legend-item"><span class="swatch" style="background: var(--amber);"></span> Music Gain Curve</span>
+        </div>
+        <span>Tap or drag waveform to seek</span>
+      </div>
+
+      <div class="transport-bar">
+        <div class="seek-row">
+          <input type="range" id="seekBar" min="0" max="1000" step="1" value="0" disabled aria-label="Playback seek bar" />
+          <span class="time-readout" id="timeDisplay">00:00 / 00:00</span>
+        </div>
+        <div class="transport-buttons">
+          <button type="button" class="btn btn-play" id="playPauseBtn" disabled>
+            ▶ Play Preview
+          </button>
+          <button type="button" class="btn btn-stop" id="stopBtn" disabled>
+            ■ Stop
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Essential Ducking Controls -->
+    <section class="card" aria-label="Auto Ducking Controls">
+      <div class="section-header">
+        <h2 class="section-title"><span class="dot dot-cyan"></span> Ducking Controls</h2>
+        <div class="presets-row">
+          <button type="button" class="preset-chip active" data-preset="doc">Documentary</button>
+          <button type="button" class="preset-chip" data-preset="podcast">Podcast</button>
+          <button type="button" class="preset-chip" data-preset="cinema">Cinematic</button>
+        </div>
+      </div>
+
+      <div class="controls-grid">
+        <div class="control-item">
+          <div class="control-head">
+            <div>
+              <div class="control-name">Voiceover Volume</div>
+              <div class="control-sub">Boost or trim narration gain</div>
+            </div>
+            <span class="control-value" id="voiceVolVal">100%</span>
+          </div>
+          <input type="range" id="voiceVolSlider" min="50" max="150" step="1" value="100" />
+        </div>
+
+        <div class="control-item">
+          <div class="control-head">
+            <div>
+              <div class="control-name">Normal Music Volume</div>
+              <div class="control-sub">Music level during silence</div>
+            </div>
+            <span class="control-value amber" id="normalVolVal">60%</span>
+          </div>
+          <input type="range" id="normalVolSlider" class="amber-slider" min="10" max="100" step="1" value="60" />
+        </div>
+
+        <div class="control-item">
+          <div class="control-head">
+            <div>
+              <div class="control-name">Ducked Music Volume</div>
+              <div class="control-sub">Music level while speaking</div>
+            </div>
+            <span class="control-value amber" id="duckVolVal">15%</span>
+          </div>
+          <input type="range" id="duckVolSlider" class="amber-slider" min="0" max="50" step="1" value="15" />
+        </div>
+
+        <div class="control-item">
+          <div class="control-head">
+            <div>
+              <div class="control-name">Voice Threshold</div>
+              <div class="control-sub">Sensitivity to trigger ducking</div>
+            </div>
+            <span class="control-value" id="thresholdVal">-32 dB</span>
+          </div>
+          <input type="range" id="thresholdSlider" min="-50" max="-10" step="1" value="-32" />
+        </div>
+
+        <div class="control-item">
+          <div class="control-head">
+            <div>
+              <div class="control-name">Hold Time (Pause Protection)</div>
+              <div class="control-sub">Prevents pumping on breaths/pauses</div>
+            </div>
+            <span class="control-value" id="holdTimeVal">0.6 s</span>
+          </div>
+          <input type="range" id="holdTimeSlider" min="0.1" max="2.0" step="0.05" value="0.6" />
+        </div>
+
+        <div class="control-item">
+          <div class="control-head">
+            <div>
+              <div class="control-name">Smoothness (Attack / Release)</div>
+              <div class="control-sub" id="smoothSub">Atk 140ms / Rel 650ms</div>
+            </div>
+            <span class="control-value amber" id="smoothVal">Medium</span>
+          </div>
+          <input type="range" id="smoothSlider" class="amber-slider" min="1" max="5" step="0.5" value="3" />
+        </div>
+      </div>
+    </section>
+
+    <!-- Fast Offline Render & WAV Export -->
+    <section class="card export-card" aria-label="Export Audio">
+      <div class="section-header">
+        <h2 class="section-title"><span class="dot dot-emerald"></span> Offline Render &amp; Export</h2>
+        <span class="control-sub">16-bit Stereo PCM WAV</span>
+      </div>
+
+      <button type="button" class="btn btn-export" id="exportBtn" disabled>
+        ⬇ Export Mixed Audio (.WAV)
+      </button>
+
+      <div class="status-banner" id="exportStatus">
+        <span id="exportStatusText">Preparing offline render...</span>
+        <div class="progress-track">
+          <div class="progress-fill" id="exportProgressBar"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      "use strict";
+
+      const CHUNK_SEC = 0.02; // 20ms RMS analysis frames
+
+      const state = {
+        audioCtx: null,
+        voiceBuffer: null,
+        musicBuffer: null,
+        voiceFileName: "",
+        musicFileName: "",
+        voiceRmsDb: new Float32Array(0),
+        voicePeaks: new Float32Array(0),
+        gainCurve: new Float32Array(0),
+        totalDuration: 0,
+
+        // Parameters
+        voiceVol: 1.0,
+        normalVol: 0.60,
+        duckVol: 0.15,
+        thresholdDb: -32,
+        holdTimeSec: 0.6,
+        smoothLevel: 3,
+        outroTailSec: 2.0,
+        loopMusic: true,
+
+        // Playback state
+        isPlaying: false,
+        playOffset: 0,
+        playStartCtxTime: 0,
+        voiceNode: null,
+        musicNode: null,
+        voiceGainNode: null,
+        musicGainNode: null,
+        rafId: null,
+        isSeeking: false,
+        isRendering: false
+      };
+
+      // DOM elements
+      const el = {
+        voiceInput: document.getElementById("voiceInput"),
+        musicInput: document.getElementById("musicInput"),
+        voicePickBtn: document.getElementById("voicePickBtn"),
+        musicPickBtn: document.getElementById("musicPickBtn"),
+        voiceClearBtn: document.getElementById("voiceClearBtn"),
+        musicClearBtn: document.getElementById("musicClearBtn"),
+        voiceBox: document.getElementById("voiceBox"),
+        musicBox: document.getElementById("musicBox"),
+        voiceName: document.getElementById("voiceName"),
+        musicName: document.getElementById("musicName"),
+        voiceDuration: document.getElementById("voiceDuration"),
+        musicDuration: document.getElementById("musicDuration"),
+        outputLengthBadge: document.getElementById("outputLengthBadge"),
+
+        loopMusicToggle: document.getElementById("loopMusicToggle"),
+        outroTailSlider: document.getElementById("outroTailSlider"),
+        outroTailVal: document.getElementById("outroTailVal"),
+
+        canvas: document.getElementById("waveformCanvas"),
+        canvasEmptyState: document.getElementById("canvasEmptyState"),
+        duckStatePill: document.getElementById("duckStatePill"),
+        seekBar: document.getElementById("seekBar"),
+        timeDisplay: document.getElementById("timeDisplay"),
+        playPauseBtn: document.getElementById("playPauseBtn"),
+        stopBtn: document.getElementById("stopBtn"),
+
+        voiceVolSlider: document.getElementById("voiceVolSlider"),
+        voiceVolVal: document.getElementById("voiceVolVal"),
+        normalVolSlider: document.getElementById("normalVolSlider"),
+        normalVolVal: document.getElementById("normalVolVal"),
+        duckVolSlider: document.getElementById("duckVolSlider"),
+        duckVolVal: document.getElementById("duckVolVal"),
+        thresholdSlider: document.getElementById("thresholdSlider"),
+        thresholdVal: document.getElementById("thresholdVal"),
+        holdTimeSlider: document.getElementById("holdTimeSlider"),
+        holdTimeVal: document.getElementById("holdTimeVal"),
+        smoothSlider: document.getElementById("smoothSlider"),
+        smoothVal: document.getElementById("smoothVal"),
+        smoothSub: document.getElementById("smoothSub"),
+
+        exportBtn: document.getElementById("exportBtn"),
+        exportStatus: document.getElementById("exportStatus"),
+        exportStatusText: document.getElementById("exportStatusText"),
+        exportProgressBar: document.getElementById("exportProgressBar"),
+        presetChips: Array.from(document.querySelectorAll(".preset-chip"))
+      };
+
+      function getOrCreateAudioContext() {
+        if (!state.audioCtx) {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          state.audioCtx = new AudioCtx();
+        }
+        return state.audioCtx;
+      }
+
+      async function ensureAudioResumed() {
+        const ctx = getOrCreateAudioContext();
+        if (ctx.state === "suspended") {
+          await ctx.resume();
+        }
+        return ctx;
+      }
+
+      function formatTime(sec) {
+        if (!isFinite(sec) || sec < 0) sec = 0;
+        const totalSec = Math.floor(sec);
+        const mins = Math.floor(totalSec / 60);
+        const secs = totalSec % 60;
+        return String(mins).padStart(2, "0") + ":" + String(secs).padStart(2, "0");
+      }
+
+      function getAttackRelease(level) {
+        // Maps 1.0..5.0 smoothness slider to attack/release times in seconds
+        const t = (level - 1) / 4; // 0..1
+        const attackSec = 0.04 + t * 0.28;   // 40ms .. 320ms
+        const releaseSec = 0.20 + t * 1.00;  // 200ms .. 1200ms
+        let label = "Medium";
+        if (level <= 1.5) label = "Fast";
+        else if (level <= 2.5) label = "Tight";
+        else if (level <= 3.5) label = "Medium";
+        else if (level <= 4.5) label = "Smooth";
+        else label = "Cinematic";
+        return { attackSec, releaseSec, label };
+      }
+
+      function analyzeVoiceoverEnvelope(buffer) {
+        const sampleRate = buffer.sampleRate;
+        const numChannels = buffer.numberOfChannels;
+        const windowSamples = Math.max(1, Math.floor(sampleRate * CHUNK_SEC));
+        const frameCount = Math.max(1, Math.ceil(buffer.length / windowSamples));
+
+        const rmsDb = new Float32Array(frameCount);
+        const peaks = new Float32Array(frameCount);
+
+        const channels = [];
+        for (let c = 0; c < numChannels; c++) {
+          channels.push(buffer.getChannelData(c));
+        }
+
+        for (let f = 0; f < frameCount; f++) {
+          const start = f * windowSamples;
+          const end = Math.min(buffer.length, start + windowSamples);
+          const count = end - start;
+          if (count <= 0) {
+            rmsDb[f] = -120;
+            peaks[f] = 0;
+            continue;
+          }
+
+          let sumSq = 0;
+          let maxPeak = 0;
+          for (let c = 0; c < numChannels; c++) {
+            const data = channels[c];
+            for (let i = start; i < end; i++) {
+              const s = data[i];
+              sumSq += s * s;
+              const abs = s < 0 ? -s : s;
+              if (abs > maxPeak) maxPeak = abs;
+            }
+          }
+
+          const rms = Math.sqrt(sumSq / (count * numChannels));
+          rmsDb[f] = rms > 1e-6 ? 20 * Math.log10(rms) : -120;
+          peaks[f] = maxPeak;
+        }
+
+        state.voiceRmsDb = rmsDb;
+        state.voicePeaks = peaks;
+      }
+
+      function computeDuckCurve() {
+        if (!state.voiceBuffer) {
+          state.gainCurve = new Float32Array(0);
+          state.totalDuration = state.musicBuffer ? state.musicBuffer.duration : 0;
+          updateTrackUI();
+          drawWaveform();
+          return;
+        }
+
+        const voiceDuration = state.voiceBuffer.duration;
+        const totalDuration = voiceDuration + state.outroTailSec;
+        state.totalDuration = totalDuration;
+
+        const totalFrames = Math.max(2, Math.ceil(totalDuration / CHUNK_SEC));
+        const voiceFrames = state.voiceRmsDb.length;
+        const curve = new Float32Array(totalFrames);
+
+        const { attackSec, releaseSec } = getAttackRelease(state.smoothLevel);
+        const attackCoeff = 1 - Math.exp(-CHUNK_SEC / Math.max(0.012, attackSec / 3));
+        const releaseCoeff = 1 - Math.exp(-CHUNK_SEC / Math.max(0.025, releaseSec / 3));
+
+        // Ensure duck volume never exceeds normal volume
+        const effectiveNormal = state.normalVol;
+        const effectiveDuck = Math.min(state.duckVol, effectiveNormal);
+
+        let holdRemaining = 0;
+        let currentGain = effectiveNormal;
+        let duckedFrameCount = 0;
+
+        for (let i = 0; i < totalFrames; i++) {
+          const t = i * CHUNK_SEC;
+          const hasSpeech = i < voiceFrames && state.voiceRmsDb[i] >= state.thresholdDb;
+
+          if (hasSpeech) {
+            holdRemaining = state.holdTimeSec;
+          } else if (holdRemaining > 0) {
+            holdRemaining = Math.max(0, holdRemaining - CHUNK_SEC);
+          }
+
+          const targetGain = (hasSpeech || holdRemaining > 0) ? effectiveDuck : effectiveNormal;
+          if (targetGain < effectiveNormal - 0.001) {
+            duckedFrameCount++;
+          }
+
+          if (i === 0) {
+            currentGain = targetGain;
+          } else {
+            const coeff = targetGain < currentGain ? attackCoeff : releaseCoeff;
+            currentGain += (targetGain - currentGain) * coeff;
+          }
+
+          let finalGain = currentGain;
+          if (state.outroTailSec > 0 && t > voiceDuration) {
+            const progress = Math.min(1, (t - voiceDuration) / state.outroTailSec);
+            const fadeFactor = 0.5 * (1 + Math.cos(Math.PI * progress));
+            finalGain *= fadeFactor;
+          } else if (state.outroTailSec === 0 && t > voiceDuration - 0.03) {
+            const progress = Math.min(1, Math.max(0, (t - (voiceDuration - 0.03)) / 0.03));
+            finalGain *= (1 - progress);
+          }
+
+          curve[i] = Math.max(0.0001, finalGain);
+        }
+
+        // Exact zero at final sample for clean tail
+        curve[totalFrames - 1] = 0;
+        state.gainCurve = curve;
+
+        const duckPercent = Math.round((duckedFrameCount / totalFrames) * 100);
+        el.duckStatePill.textContent = "Ducking active " + duckPercent + "% of mix";
+
+        updateTrackUI();
+        drawWaveform();
+        if (state.isPlaying) {
+          rescheduleLiveGains();
+        }
+      }
+
+      function updateTrackUI() {
+        const hasVoice = Boolean(state.voiceBuffer);
+        const hasMusic = Boolean(state.musicBuffer);
+        const readyToPlay = hasVoice || hasMusic;
+
+        el.outputLengthBadge.textContent = "Mix: " + formatTime(state.totalDuration);
+        el.seekBar.disabled = !readyToPlay;
+        el.playPauseBtn.disabled = !readyToPlay;
+        el.stopBtn.disabled = !readyToPlay;
+        el.exportBtn.disabled = !hasVoice || state.isRendering;
+
+        el.canvasEmptyState.style.display = readyToPlay ? "none" : "flex";
+
+        const shownOffset = Math.min(state.playOffset, state.totalDuration);
+        el.timeDisplay.textContent = formatTime(shownOffset) + " / " + formatTime(state.totalDuration);
+        if (!state.isSeeking) {
+          el.seekBar.value = state.totalDuration > 0
+            ? Math.round((shownOffset / state.totalDuration) * 1000)
+            : 0;
+        }
+      }
+
+      function buildSubCurveFromOffset(offsetSec) {
+        if (!state.gainCurve.length || state.totalDuration <= 0) {
+          return new Float32Array([state.normalVol, state.normalVol]);
+        }
+        const startFrame = Math.min(
+          state.gainCurve.length - 2,
+          Math.max(0, Math.floor(offsetSec / CHUNK_SEC))
+        );
+        const slice = state.gainCurve.slice(startFrame);
+        if (slice.length < 2) {
+          return new Float32Array([slice[0] || 0, 0]);
+        }
+        return slice;
+      }
+
+      function stopActiveNodes() {
+        if (state.rafId) {
+          cancelAnimationFrame(state.rafId);
+          state.rafId = null;
+        }
+        try {
+          if (state.voiceNode) {
+            state.voiceNode.onended = null;
+            state.voiceNode.stop();
+            state.voiceNode.disconnect();
+          }
+        } catch (_) {}
+        try {
+          if (state.musicNode) {
+            state.musicNode.onended = null;
+            state.musicNode.stop();
+            state.musicNode.disconnect();
+          }
+        } catch (_) {}
+        try {
+          if (state.voiceGainNode) state.voiceGainNode.disconnect();
+          if (state.musicGainNode) state.musicGainNode.disconnect();
+        } catch (_) {}
+
+        state.voiceNode = null;
+        state.musicNode = null;
+        state.voiceGainNode = null;
+        state.musicGainNode = null;
+      }
+
+      function rescheduleLiveGains() {
+        if (!state.isPlaying || !state.audioCtx) return;
+        const now = state.audioCtx.currentTime;
+        const elapsed = Math.max(0, now - state.playStartCtxTime);
+        const currentPos = state.playOffset + elapsed;
+
+        if (state.voiceGainNode) {
+          state.voiceGainNode.gain.setTargetAtTime(state.voiceVol, now, 0.015);
+        }
+
+        if (state.musicGainNode) {
+          const gainParam = state.musicGainNode.gain;
+          try {
+            if (typeof gainParam.cancelAndHoldAtTime === "function") {
+              gainParam.cancelAndHoldAtTime(now);
+            } else {
+              gainParam.cancelScheduledValues(now);
+              gainParam.setValueAtTime(gainParam.value, now);
+            }
+          } catch (_) {
+            gainParam.cancelScheduledValues(now);
+            gainParam.setValueAtTime(gainParam.value, now);
+          }
+
+          if (state.voiceBuffer) {
+            const remaining = Math.max(0.05, state.totalDuration - currentPos);
+            const subCurve = buildSubCurveFromOffset(currentPos);
+            subCurve[0] = gainParam.value;
+            gainParam.setValueCurveAtTime(subCurve, now + 0.004, remaining);
+          } else {
+            gainParam.setTargetAtTime(state.normalVol, now, 0.02);
+          }
+        }
+      }
+
+      async function startPlayback(fromOffset) {
+        const ctx = await ensureAudioResumed();
+        stopActiveNodes();
+
+        const totalDur = state.totalDuration;
+        if (totalDur <= 0) return;
+
+        const offset = Math.max(0, Math.min(fromOffset, Math.max(0, totalDur - 0.02)));
+        const remaining = totalDur - offset;
+        const startAt = ctx.currentTime + 0.03;
+
+        state.playOffset = offset;
+        state.playStartCtxTime = startAt;
+        state.isPlaying = true;
+        el.playPauseBtn.textContent = "❚❚ Pause";
+
+        // Voiceover source
+        if (state.voiceBuffer && offset < state.voiceBuffer.duration) {
+          const vNode = ctx.createBufferSource();
+          vNode.buffer = state.voiceBuffer;
+          const vGain = ctx.createGain();
+          vGain.gain.setValueAtTime(state.voiceVol, startAt);
+          vNode.connect(vGain);
+          vGain.connect(ctx.destination);
+          const vRemaining = state.voiceBuffer.duration - offset;
+          vNode.start(startAt, offset, vRemaining);
+          state.voiceNode = vNode;
+          state.voiceGainNode = vGain;
+        }
+
+        // Music source
+        if (state.musicBuffer) {
+          const mDur = state.musicBuffer.duration;
+          const shouldPlayMusic = state.loopMusic || offset < mDur;
+          if (shouldPlayMusic && mDur > 0) {
+            const mNode = ctx.createBufferSource();
+            mNode.buffer = state.musicBuffer;
+            mNode.loop = state.loopMusic;
+            if (state.loopMusic) {
+              mNode.loopStart = 0;
+              mNode.loopEnd = mDur;
+            }
+
+            const mGain = ctx.createGain();
+            if (state.voiceBuffer && state.gainCurve.length >= 2) {
+              const subCurve = buildSubCurveFromOffset(offset);
+              mGain.gain.setValueAtTime(subCurve[0], startAt);
+              mGain.gain.setValueCurveAtTime(subCurve, startAt, Math.max(0.02, remaining));
+            } else {
+              mGain.gain.setValueAtTime(state.normalVol, startAt);
+            }
+
+            mNode.connect(mGain);
+            mGain.connect(ctx.destination);
+
+            const mOffset = state.loopMusic ? (offset % mDur) : offset;
+            if (state.loopMusic) {
+              mNode.start(startAt, mOffset, remaining);
+            } else {
+              const mPlayDur = Math.min(remaining, mDur - mOffset);
+              if (mPlayDur > 0) {
+                mNode.start(startAt, mOffset, mPlayDur);
+              }
+            }
+
+            state.musicNode = mNode;
+            state.musicGainNode = mGain;
+          }
+        }
+
+        const tick = () => {
+          if (!state.isPlaying) return;
+          const now = ctx.currentTime;
+          const pos = now < state.playStartCtxTime
+            ? state.playOffset
+            : state.playOffset + (now - state.playStartCtxTime);
+
+          if (pos >= state.totalDuration) {
+            stopPlayback(true);
+            return;
+          }
+
+          if (!state.isSeeking) {
+            el.seekBar.value = Math.round((pos / state.totalDuration) * 1000);
+            el.timeDisplay.textContent = formatTime(pos) + " / " + formatTime(state.totalDuration);
+          }
+          drawWaveform(pos);
+          state.rafId = requestAnimationFrame(tick);
+        };
+        state.rafId = requestAnimationFrame(tick);
+      }
+
+      function pausePlayback() {
+        if (!state.isPlaying || !state.audioCtx) return;
+        const now = state.audioCtx.currentTime;
+        const elapsed = Math.max(0, now - state.playStartCtxTime);
+        state.playOffset = Math.min(state.totalDuration, state.playOffset + elapsed);
+        state.isPlaying = false;
+        stopActiveNodes();
+        el.playPauseBtn.textContent = "▶ Play Preview";
+        updateTrackUI();
+        drawWaveform(state.playOffset);
+      }
+
+      function stopPlayback(resetToZero) {
+        state.isPlaying = false;
+        stopActiveNodes();
+        if (resetToZero) {
+          state.playOffset = 0;
+        }
+        el.playPauseBtn.textContent = "▶ Play Preview";
+        updateTrackUI();
+        drawWaveform(state.playOffset);
+      }
+
+      // Draw dual-layer waveform + ducking gain curve
+      function drawWaveform(playheadSec) {
+        const canvas = el.canvas;
+        const rect = canvas.getBoundingClientRect();
+        if (rect.width <= 0 || rect.height <= 0) return;
+
+        const dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+        const w = Math.floor(rect.width * dpr);
+        const h = Math.floor(rect.height * dpr);
+        if (canvas.width !== w || canvas.height !== h) {
+          canvas.width = w;
+          canvas.height = h;
+        }
+
+        const ctx = canvas.getContext("2d");
+        ctx.clearRect(0, 0, w, h);
+
+        // Background subtle grid
+        ctx.strokeStyle = "rgba(148, 163, 184, 0.10)";
+        ctx.lineWidth = 1 * dpr;
+        [0.25, 0.5, 0.75].forEach((ratio) => {
+          const y = Math.round(h * ratio) + 0.5;
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(w, y);
+          ctx.stroke();
+        });
+
+        const totalDur = state.totalDuration;
+        if (totalDur <= 0) return;
+
+        const padTop = 10 * dpr;
+        const padBottom = 10 * dpr;
+        const drawH = h - padTop - padBottom;
+        const centerY = padTop + drawH * 0.5;
+
+        // Outro tail highlight zone
+        if (state.voiceBuffer && state.outroTailSec > 0) {
+          const outroStartX = (state.voiceBuffer.duration / totalDur) * w;
+          ctx.fillStyle = "rgba(16, 185, 129, 0.08)";
+          ctx.fillRect(outroStartX, 0, w - outroStartX, h);
+
+          ctx.strokeStyle = "rgba(16, 185, 129, 0.45)";
+          ctx.setLineDash([4 * dpr, 4 * dpr]);
+          ctx.beginPath();
+          ctx.moveTo(outroStartX, 0);
+          ctx.lineTo(outroStartX, h);
+          ctx.stroke();
+          ctx.setLineDash([]);
+        }
+
+        // Layer 1: Voiceover waveform
+        if (state.voiceBuffer && state.voicePeaks.length > 0) {
+          const bars = Math.max(60, Math.floor(rect.width / 3));
+          const barWidth = w / bars;
+          const totalFrames = Math.ceil(totalDur / CHUNK_SEC);
+
+          for (let b = 0; b < bars; b++) {
+            const frameStart = Math.floor((b / bars) * totalFrames);
+            const frameEnd = Math.max(frameStart + 1, Math.floor(((b + 1) / bars) * totalFrames));
+
+            let peak = 0;
+            let maxDb = -120;
+            for (let f = frameStart; f < frameEnd && f < state.voicePeaks.length; f++) {
+              if (state.voicePeaks[f] > peak) peak = state.voicePeaks[f];
+              if (state.voiceRmsDb[f] > maxDb) maxDb = state.voiceRmsDb[f];
+            }
+
+            if (peak <= 0.001) continue;
+            const amp = Math.min(1, peak * state.voiceVol);
+            const barH = Math.max(2 * dpr, amp * drawH * 0.88);
+            const x = b * barWidth;
+            const isSpeech = maxDb >= state.thresholdDb;
+
+            ctx.fillStyle = isSpeech
+              ? "rgba(34, 211, 238, 0.85)"
+              : "rgba(56, 189, 248, 0.30)";
+            ctx.fillRect(x, centerY - barH / 2, Math.max(1 * dpr, barWidth - 1 * dpr), barH);
+          }
+        } else if (state.musicBuffer) {
+          // Music-only preview flat wave indicator
+          ctx.fillStyle = "rgba(245, 158, 11, 0.25)";
+          ctx.fillRect(0, centerY - 6 * dpr, w, 12 * dpr);
+        }
+
+        // Layer 2: Background Music Ducking Curve
+        if (state.gainCurve.length > 1) {
+          const len = state.gainCurve.length;
+          ctx.beginPath();
+          for (let i = 0; i < len; i++) {
+            const x = (i / (len - 1)) * w;
+            const g = Math.max(0, Math.min(1, state.gainCurve[i]));
+            const y = padTop + drawH * (1 - g);
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+
+          // Translucent amber area fill
+          ctx.save();
+          ctx.lineTo(w, h);
+          ctx.lineTo(0, h);
+          ctx.closePath();
+          const grad = ctx.createLinearGradient(0, padTop, 0, h);
+          grad.addColorStop(0, "rgba(245, 158, 11, 0.24)");
+          grad.addColorStop(1, "rgba(245, 158, 11, 0.02)");
+          ctx.fillStyle = grad;
+          ctx.fill();
+          ctx.restore();
+
+          // Crisp ducking curve stroke
+          ctx.beginPath();
+          for (let i = 0; i < len; i++) {
+            const x = (i / (len - 1)) * w;
+            const g = Math.max(0, Math.min(1, state.gainCurve[i]));
+            const y = padTop + drawH * (1 - g);
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+          ctx.strokeStyle = "#F59E0B";
+          ctx.lineWidth = 2.2 * dpr;
+          ctx.stroke();
+        }
+
+        // Playhead
+        const currentSec = typeof playheadSec === "number" ? playheadSec : state.playOffset;
+        if (totalDur > 0 && currentSec >= 0) {
+          const px = Math.max(0, Math.min(w, (currentSec / totalDur) * w));
+          ctx.strokeStyle = "#FFFFFF";
+          ctx.lineWidth = 2 * dpr;
+          ctx.beginPath();
+          ctx.moveTo(px, 0);
+          ctx.lineTo(px, h);
+          ctx.stroke();
+
+          ctx.fillStyle = "#22D3EE";
+          ctx.beginPath();
+          ctx.arc(px, 8 * dpr, 4.5 * dpr, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      async function handleFileSelection(file, type) {
+        if (!file) return;
+        const ctx = getOrCreateAudioContext();
+        try {
+          if (type === "voice") {
+            el.voiceName.textContent = "Decoding " + file.name + "...";
+            el.voiceName.classList.remove("placeholder");
+          } else {
+            el.musicName.textContent = "Decoding " + file.name + "...";
+            el.musicName.classList.remove("placeholder");
+          }
+
+          const arrayBuf = await file.arrayBuffer();
+          const audioBuf = await ctx.decodeAudioData(arrayBuf);
+
+          stopPlayback(true);
+
+          if (type === "voice") {
+            state.voiceBuffer = audioBuf;
+            state.voiceFileName = file.name;
+            el.voiceName.textContent = file.name;
+            el.voiceName.classList.remove("placeholder");
+            el.voiceDuration.textContent = formatTime(audioBuf.duration);
+            el.voiceBox.classList.add("loaded-voice");
+            el.voiceClearBtn.disabled = false;
+            analyzeVoiceoverEnvelope(audioBuf);
+          } else {
+            state.musicBuffer = audioBuf;
+            state.musicFileName = file.name;
+            el.musicName.textContent = file.name;
+            el.musicName.classList.remove("placeholder");
+            el.musicDuration.textContent = formatTime(audioBuf.duration);
+            el.musicBox.classList.add("loaded-music");
+            el.musicClearBtn.disabled = false;
+          }
+
+          computeDuckCurve();
+        } catch (err) {
+          console.error(err);
+          if (type === "voice") {
+            state.voiceBuffer = null;
+            el.voiceName.textContent = "Unsupported or corrupt audio file";
+            el.voiceName.classList.add("placeholder");
+            el.voiceDuration.textContent = "00:00";
+            el.voiceBox.classList.remove("loaded-voice");
+            el.voiceClearBtn.disabled = true;
+          } else {
+            state.musicBuffer = null;
+            el.musicName.textContent = "Unsupported or corrupt audio file";
+            el.musicName.classList.add("placeholder");
+            el.musicDuration.textContent = "00:00";
+            el.musicBox.classList.remove("loaded-music");
+            el.musicClearBtn.disabled = true;
+          }
+          computeDuckCurve();
+        }
+      }
+
+      function clearTrack(type) {
+        stopPlayback(true);
+        if (type === "voice") {
+          state.voiceBuffer = null;
+          state.voiceFileName = "";
+          state.voiceRmsDb = new Float32Array(0);
+          state.voicePeaks = new Float32Array(0);
+          el.voiceInput.value = "";
+          el.voiceName.textContent = "No voiceover loaded";
+          el.voiceName.classList.add("placeholder");
+          el.voiceDuration.textContent = "00:00";
+          el.voiceBox.classList.remove("loaded-voice");
+          el.voiceClearBtn.disabled = true;
+        } else {
+          state.musicBuffer = null;
+          state.musicFileName = "";
+          el.musicInput.value = "";
+          el.musicName.textContent = "No music loaded";
+          el.musicName.classList.add("placeholder");
+          el.musicDuration.textContent = "00:00";
+          el.musicBox.classList.remove("loaded-music");
+          el.musicClearBtn.disabled = true;
+        }
+        computeDuckCurve();
+      }
+
+      // Encode AudioBuffer to 16-bit Stereo PCM WAV with soft peak protection
+      function encodeAudioBufferToWav(buffer) {
+        const numChannels = 2;
+        const sampleRate = buffer.sampleRate;
+        const numFrames = buffer.length;
+        const bytesPerSample = 2;
+        const blockAlign = numChannels * bytesPerSample;
+        const dataSize = numFrames * blockAlign;
+        const totalBytes = 44 + dataSize;
+
+        const out = new Uint8Array(totalBytes);
+        const view = new DataView(out.buffer);
+
+        function writeStr(offset, str) {
+          for (let i = 0; i < str.length; i++) {
+            view.setUint8(offset + i, str.charCodeAt(i));
+          }
+        }
+
+        writeStr(0, "RIFF");
+        view.setUint32(4, 36 + dataSize, true);
+        writeStr(8, "WAVE");
+        writeStr(12, "fmt ");
+        view.setUint32(16, 16, true); // PCM chunk size
+        view.setUint16(20, 1, true);  // PCM format
+        view.setUint16(22, numChannels, true);
+        view.setUint32(24, sampleRate, true);
+        view.setUint32(28, sampleRate * blockAlign, true);
+        view.setUint16(32, blockAlign, true);
+        view.setUint16(34, 16, true); // Bits per sample
+        writeStr(36, "data");
+        view.setUint32(40, dataSize, true);
+
+        const left = buffer.getChannelData(0);
+        const right = buffer.numberOfChannels > 1 ? buffer.getChannelData(1) : left;
+
+        let pos = 44;
+        for (let i = 0; i < numFrames; i++) {
+          let l = left[i];
+          let r = right[i];
+
+          // Gentle soft-knee limiting above 0.92 to avoid digital clipping when voiceover > 100%
+          if (l > 0.92) l = 0.92 + 0.08 * Math.tanh((l - 0.92) / 0.08);
+          else if (l < -0.92) l = -0.92 - 0.08 * Math.tanh((-l - 0.92) / 0.08);
+
+          if (r > 0.92) r = 0.92 + 0.08 * Math.tanh((r - 0.92) / 0.08);
+          else if (r < -0.92) r = -0.92 - 0.08 * Math.tanh((-r - 0.92) / 0.08);
+
+          const intL = l < 0 ? Math.max(-32768, Math.round(l * 32768)) : Math.min(32767, Math.round(l * 32767));
+          const intR = r < 0 ? Math.max(-32768, Math.round(r * 32768)) : Math.min(32767, Math.round(r * 32767));
+
+          view.setInt16(pos, intL, true);
+          view.setInt16(pos + 2, intR, true);
+          pos += 4;
+        }
+
+        return out;
+      }
+
+      function uint8ToBase64(uint8) {
+        const CHUNK = 0x8000;
+        const parts = [];
+        for (let i = 0; i < uint8.length; i += CHUNK) {
+          parts.push(String.fromCharCode.apply(null, uint8.subarray(i, i + CHUNK)));
+        }
+        return btoa(parts.join(""));
+      }
+
+      async function exportMixedWav() {
+        if (!state.voiceBuffer || state.isRendering) return;
+
+        state.isRendering = true;
+        el.exportBtn.disabled = true;
+        el.exportStatus.classList.add("visible");
+        el.exportProgressBar.style.width = "18%";
+        el.exportStatusText.textContent = "Configuring OfflineAudioContext...";
+
+        try {
+          await new Promise((r) => setTimeout(r, 20));
+          const sampleRate = state.voiceBuffer.sampleRate || 44100;
+          const totalDur = Math.max(0.1, state.totalDuration);
+          const totalSamples = Math.ceil(totalDur * sampleRate);
+
+          const OfflineCtx = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+          const offline = new OfflineCtx(2, totalSamples, sampleRate);
+
+          // Voiceover graph
+          const vSrc = offline.createBufferSource();
+          vSrc.buffer = state.voiceBuffer;
+          const vGain = offline.createGain();
+          vGain.gain.setValueAtTime(state.voiceVol, 0);
+          vSrc.connect(vGain);
+          vGain.connect(offline.destination);
+          vSrc.start(0);
+
+          // Background music graph
+          if (state.musicBuffer && state.musicBuffer.duration > 0) {
+            const mSrc = offline.createBufferSource();
+            mSrc.buffer = state.musicBuffer;
+            mSrc.loop = state.loopMusic;
+            if (state.loopMusic) {
+              mSrc.loopStart = 0;
+              mSrc.loopEnd = state.musicBuffer.duration;
+            }
+            const mGain = offline.createGain();
+            if (state.gainCurve.length >= 2) {
+              mGain.gain.setValueAtTime(state.gainCurve[0], 0);
+              mGain.gain.setValueCurveAtTime(state.gainCurve, 0, totalDur);
+            } else {
+              mGain.gain.setValueAtTime(state.normalVol, 0);
+            }
+            mSrc.connect(mGain);
+            mGain.connect(offline.destination);
+            mSrc.start(0, 0, state.loopMusic ? totalDur : Math.min(totalDur, state.musicBuffer.duration));
+          }
+
+          el.exportProgressBar.style.width = "48%";
+          el.exportStatusText.textContent = "Rendering ducked mix faster than real-time...";
+          await new Promise((r) => setTimeout(r, 20));
+
+          const renderedBuffer = await offline.startRendering();
+
+          el.exportProgressBar.style.width = "82%";
+          el.exportStatusText.textContent = "Encoding 16-bit stereo WAV...";
+          await new Promise((r) => setTimeout(r, 20));
+
+          const wavBytes = encodeAudioBufferToWav(renderedBuffer);
+          const baseName = (state.voiceFileName || "autoduck-mix").replace(/\.[^/.]+$/, "");
+          const outName = baseName + "_ducked.wav";
+
+          if (window.AndroidBridge && typeof window.AndroidBridge.beginWavSave === "function") {
+            window.AndroidBridge.beginWavSave(outName);
+            const RAW_CHUNK_SIZE = 196608; // 192 KB (divisible by 3 for clean Base64 chunks)
+            for (let offset = 0; offset < wavBytes.length; offset += RAW_CHUNK_SIZE) {
+              const slice = wavBytes.subarray(offset, Math.min(wavBytes.length, offset + RAW_CHUNK_SIZE));
+              window.AndroidBridge.appendWavChunk(uint8ToBase64(slice));
+            }
+            window.AndroidBridge.finishWavSave();
+          } else if (window.AndroidBridge && typeof window.AndroidBridge.saveWavBase64 === "function") {
+            const b64 = uint8ToBase64(wavBytes);
+            window.AndroidBridge.saveWavBase64(outName, b64);
+          } else {
+            const blob = new Blob([wavBytes], { type: "audio/wav" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.style.display = "none";
+            a.href = url;
+            a.download = outName;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+              document.body.removeChild(a);
+              URL.revokeObjectURL(url);
+            }, 1500);
+          }
+
+          el.exportProgressBar.style.width = "100%";
+          el.exportStatusText.textContent = "Export complete: " + outName + " (" + (wavBytes.length / (1024 * 1024)).toFixed(2) + " MB)";
+        } catch (err) {
+          console.error(err);
+          el.exportProgressBar.style.width = "0%";
+          el.exportStatusText.textContent = "Export error: " + (err && err.message ? err.message : "Unable to render mix.");
+        } finally {
+          state.isRendering = false;
+          el.exportBtn.disabled = !state.voiceBuffer;
+        }
+      }
+
+      // Bind UI events
+      el.voicePickBtn.addEventListener("click", () => el.voiceInput.click());
+      el.musicPickBtn.addEventListener("click", () => el.musicInput.click());
+      el.voiceInput.addEventListener("change", (e) => handleFileSelection(e.target.files[0], "voice"));
+      el.musicInput.addEventListener("change", (e) => handleFileSelection(e.target.files[0], "music"));
+      el.voiceClearBtn.addEventListener("click", () => clearTrack("voice"));
+      el.musicClearBtn.addEventListener("click", () => clearTrack("music"));
+
+      el.loopMusicToggle.addEventListener("change", () => {
+        state.loopMusic = el.loopMusicToggle.checked;
+        if (state.isPlaying) {
+          const currentPos = state.playOffset + Math.max(0, state.audioCtx.currentTime - state.playStartCtxTime);
+          startPlayback(currentPos);
+        } else {
+          computeDuckCurve();
+        }
+      });
+
+      el.outroTailSlider.addEventListener("input", () => {
+        state.outroTailSec = parseFloat(el.outroTailSlider.value);
+        el.outroTailVal.textContent = state.outroTailSec.toFixed(1) + " s";
+        computeDuckCurve();
+      });
+
+      el.voiceVolSlider.addEventListener("input", () => {
+        const pct = parseInt(el.voiceVolSlider.value, 10);
+        state.voiceVol = pct / 100;
+        el.voiceVolVal.textContent = pct + "%";
+        drawWaveform();
+        if (state.isPlaying) rescheduleLiveGains();
+      });
+
+      el.normalVolSlider.addEventListener("input", () => {
+        const pct = parseInt(el.normalVolSlider.value, 10);
+        state.normalVol = pct / 100;
+        el.normalVolVal.textContent = pct + "%";
+        clearPresetHighlight();
+        computeDuckCurve();
+      });
+
+      el.duckVolSlider.addEventListener("input", () => {
+        const pct = parseInt(el.duckVolSlider.value, 10);
+        state.duckVol = pct / 100;
+        el.duckVolVal.textContent = pct + "%";
+        clearPresetHighlight();
+        computeDuckCurve();
+      });
+
+      el.thresholdSlider.addEventListener("input", () => {
+        const db = parseInt(el.thresholdSlider.value, 10);
+        state.thresholdDb = db;
+        el.thresholdVal.textContent = db + " dB";
+        clearPresetHighlight();
+        computeDuckCurve();
+      });
+
+      el.holdTimeSlider.addEventListener("input", () => {
+        const sec = parseFloat(el.holdTimeSlider.value);
+        state.holdTimeSec = sec;
+        el.holdTimeVal.textContent = sec.toFixed(2).replace(/0$/, "") + " s";
+        clearPresetHighlight();
+        computeDuckCurve();
+      });
+
+      el.smoothSlider.addEventListener("input", () => {
+        const lvl = parseFloat(el.smoothSlider.value);
+        state.smoothLevel = lvl;
+        const { attackSec, releaseSec, label } = getAttackRelease(lvl);
+        el.smoothVal.textContent = label;
+        el.smoothSub.textContent = "Atk " + Math.round(attackSec * 1000) + "ms / Rel " + Math.round(releaseSec * 1000) + "ms";
+        clearPresetHighlight();
+        computeDuckCurve();
+      });
+
+      function clearPresetHighlight() {
+        el.presetChips.forEach((chip) => chip.classList.remove("active"));
+      }
+
+      const PRESETS = {
+        doc: { normal: 60, duck: 15, threshold: -32, hold: 0.6, smooth: 3 },
+        podcast: { normal: 50, duck: 10, threshold: -35, hold: 0.45, smooth: 2 },
+        cinema: { normal: 75, duck: 22, threshold: -30, hold: 0.9, smooth: 4.5 }
+      };
+
+      el.presetChips.forEach((chip) => {
+        chip.addEventListener("click", () => {
+          const p = PRESETS[chip.dataset.preset];
+          if (!p) return;
+          clearPresetHighlight();
+          chip.classList.add("active");
+
+          el.normalVolSlider.value = p.normal;
+          state.normalVol = p.normal / 100;
+          el.normalVolVal.textContent = p.normal + "%";
+
+          el.duckVolSlider.value = p.duck;
+          state.duckVol = p.duck / 100;
+          el.duckVolVal.textContent = p.duck + "%";
+
+          el.thresholdSlider.value = p.threshold;
+          state.thresholdDb = p.threshold;
+          el.thresholdVal.textContent = p.threshold + " dB";
+
+          el.holdTimeSlider.value = p.hold;
+          state.holdTimeSec = p.hold;
+          el.holdTimeVal.textContent = p.hold.toFixed(2).replace(/0$/, "") + " s";
+
+          el.smoothSlider.value = p.smooth;
+          state.smoothLevel = p.smooth;
+          const { attackSec, releaseSec, label } = getAttackRelease(p.smooth);
+          el.smoothVal.textContent = label;
+          el.smoothSub.textContent = "Atk " + Math.round(attackSec * 1000) + "ms / Rel " + Math.round(releaseSec * 1000) + "ms";
+
+          computeDuckCurve();
+        });
+      });
+
+      el.playPauseBtn.addEventListener("click", async () => {
+        await ensureAudioResumed();
+        if (state.isPlaying) {
+          pausePlayback();
+        } else {
+          if (state.playOffset >= state.totalDuration - 0.05) {
+            state.playOffset = 0;
+          }
+          startPlayback(state.playOffset);
+        }
+      });
+
+      el.stopBtn.addEventListener("click", () => stopPlayback(true));
+
+      el.seekBar.addEventListener("input", () => {
+        state.isSeeking = true;
+        const target = (parseInt(el.seekBar.value, 10) / 1000) * state.totalDuration;
+        el.timeDisplay.textContent = formatTime(target) + " / " + formatTime(state.totalDuration);
+        drawWaveform(target);
+      });
+
+      el.seekBar.addEventListener("change", async () => {
+        const target = (parseInt(el.seekBar.value, 10) / 1000) * state.totalDuration;
+        state.isSeeking = false;
+        state.playOffset = target;
+        if (state.isPlaying) {
+          await startPlayback(target);
+        } else {
+          drawWaveform(target);
+        }
+      });
+
+      // Touch / click scrubbing on waveform canvas
+      let canvasDragging = false;
+      function seekFromPointer(clientX) {
+        if (state.totalDuration <= 0) return;
+        const rect = el.canvas.getBoundingClientRect();
+        const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+        const target = ratio * state.totalDuration;
+        state.playOffset = target;
+        el.seekBar.value = Math.round(ratio * 1000);
+        el.timeDisplay.textContent = formatTime(target) + " / " + formatTime(state.totalDuration);
+        drawWaveform(target);
+        return target;
+      }
+
+      el.canvas.addEventListener("pointerdown", (e) => {
+        if (state.totalDuration <= 0) return;
+        canvasDragging = true;
+        el.canvas.setPointerCapture(e.pointerId);
+        seekFromPointer(e.clientX);
+      });
+
+      el.canvas.addEventListener("pointermove", (e) => {
+        if (!canvasDragging) return;
+        seekFromPointer(e.clientX);
+      });
+
+      el.canvas.addEventListener("pointerup", (e) => {
+        if (!canvasDragging) return;
+        canvasDragging = false;
+        const target = seekFromPointer(e.clientX);
+        if (state.isPlaying && typeof target === "number") {
+          startPlayback(target);
+        }
+      });
+
+      el.exportBtn.addEventListener("click", exportMixedWav);
+
+      // Resize observer for sharp canvas rendering
+      if (typeof ResizeObserver !== "undefined") {
+        new ResizeObserver(() => drawWaveform()).observe(el.canvas);
+      } else {
+        window.addEventListener("resize", () => drawWaveform());
+      }
+
+      updateTrackUI();
+    })();
+  </script>
+</body>
+</html>
